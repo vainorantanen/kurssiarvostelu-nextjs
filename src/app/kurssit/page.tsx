@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import ReviewBox from '@/components/ReviewBox';
 import prisma from '@/db';
 import Link from 'next/link';
 
@@ -35,7 +34,9 @@ export default async function Courses() {
         <ul className="pl-4">
           {reviews.map((review) => (
             <li key={review.id} className="my-2">
-              <ReviewBox {...review} />
+              <Link href={`/kurssit/${review.id}`}>
+                <p>{review.description}</p>
+              </Link>
             </li>
           ))}
         </ul>

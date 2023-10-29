@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import ReviewBox from '@/components/ReviewBox';
 import prisma from '@/db';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
+
+import LoginInfo from '@/components/LoginInfo'
+import { getServerSession } from 'next-auth';
+import { authOptions } from './api/auth/[...nextauth]/route';
 
 function getReviews() {
   return prisma.review.findMany()
@@ -10,9 +11,14 @@ function getReviews() {
 
 export default async function Home() {
 
+  const session = await getServerSession(authOptions)
+
+  console.log(session)
+
   const reviews = await getReviews()
     return (
       <div className="flex flex-col items-center space-y-4">
+        {session && <LoginInfo />}
         <h1 className="text-4xl font-bold">Tervetuloa</h1>
         <div className="flex items-center space-x-2">
           <input
@@ -42,7 +48,9 @@ export default async function Home() {
         <ul className="pl-4">
           {reviews.map((review) => (
             <li key={review.id} className="my-2">
-              <ReviewBox {...review} />
+              <Link href={`/kurssit/${review.id}`}>
+                <p>{review.description}</p>
+              </Link>
             </li>
           ))}
         </ul>

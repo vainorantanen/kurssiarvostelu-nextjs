@@ -1,5 +1,4 @@
-import SingleReview from "@/components/SingleReview";
-import DeleteReview from "@/components/SingleReview";
+import DeleteReviewButton from "@/components/SingleReview";
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -42,7 +41,12 @@ export default async function SingleReviewPage({ params }: any) {
 
   return (
     <div className="text-center">
-        <SingleReview {...review} deleteReview={deleteReview}/>
+      <Link href="/kurssit" className="text-blue-500 hover:underline">
+        Takaisin
+      </Link>
+      <h1 className="text-2xl font-bold my-4">Yksittäinen arvostelu</h1>
+      <p>{review.description}</p>
+        <DeleteReviewButton id={review.id} deleteReview={deleteReview}/>
     </div>
   );
 }

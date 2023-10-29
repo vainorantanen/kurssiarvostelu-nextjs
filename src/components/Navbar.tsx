@@ -1,3 +1,5 @@
+"use client"
+
 import Link from 'next/link';
 
 export default function Navbar() {
@@ -20,6 +22,11 @@ export default function Navbar() {
           <li>
             <Link href="/lisaa-arvostelu" className="text-white hover:text-blue-300">
               Lisää arvostelu
+            </Link>
+          </li>
+          <li>
+            <Link href="/register" className="text-white hover:text-blue-300">
+              Rekisteröidy
             </Link>
           </li>
         </ul>
