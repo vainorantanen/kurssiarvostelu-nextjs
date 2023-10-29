@@ -19,8 +19,12 @@ export default function RootLayout({
       <body
         className={`${inter.className} bg-slate-800 text-slate-100 container mx-auto p-4`}
       >
-        <Navbar />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <div>
+            <Navbar />
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )

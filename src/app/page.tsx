@@ -13,12 +13,11 @@ export default async function Home() {
 
   const session = await getServerSession(authOptions)
 
-  console.log(session)
+  console.log("session at Home", session)
 
   const reviews = await getReviews()
     return (
       <div className="flex flex-col items-center space-y-4">
-        {session && <LoginInfo />}
         <h1 className="text-4xl font-bold">Tervetuloa</h1>
         <div className="flex items-center space-x-2">
           <input
