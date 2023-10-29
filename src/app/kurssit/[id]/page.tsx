@@ -47,6 +47,9 @@ export default async function SingleCoursePage({ params }: any) {
       <h1 className="text-2xl font-bold my-4">Yksittäinen Kurssi</h1>
       <p>{course.name}</p>
         <DeleteCourseButton id={course.id} deleteCourse={deleteCourse}/>
+        <Link href={`/lisaa-arvostelu/${course.id}`} className="text-blue-500 hover:underline">
+        Arvostele tämä kurssi
+      </Link>
     </div>
   );
 }

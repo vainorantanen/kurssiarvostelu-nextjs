@@ -69,6 +69,16 @@ export default async function Home() {
         >
           Selaa kursseja
         </Link>
+        <h1 className="text-2xl font-bold">Koulut</h1>
+        <ul className="pl-4">
+          {schools.map((school) => (
+            <li key={school.id} className="my-2">
+              <Link href={`/koulut/${school.id}`}>
+                <p>{school.name}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
         <h1 className="text-2xl font-bold">Kurssit</h1>
         <ul className="pl-4">
           {courses.map((course) => (
@@ -85,16 +95,6 @@ export default async function Home() {
             <li key={review.id} className="my-2">
               <Link href={`/arvostelut/${review.id}`}>
                 <p>{review.description}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <h1 className="text-2xl font-bold">Koulut</h1>
-        <ul className="pl-4">
-          {schools.map((school) => (
-            <li key={school.id} className="my-2">
-              <Link href={`/koulut/${school.id}`}>
-                <p>{school.name}</p>
               </Link>
             </li>
           ))}

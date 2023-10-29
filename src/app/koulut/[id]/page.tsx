@@ -5,6 +5,11 @@ import { redirect } from "next/navigation";
 async function getSchool(schoolId: string) {
   return prisma.school.findUnique({ where: { id: schoolId } });
 }
+
+async function getCoursesBySchool(schoolId: string) {
+  return prisma.course.findMany({where: { schoolId }})
+  
+}
 /*
 export async function deleteschool(id: string) {
     "use server"
@@ -26,6 +31,10 @@ export async function deleteschool(id: string) {
 export default async function SingleschoolPage({ params }: any) {
   const school = await getSchool(params.id);
 
+  const coursesOfSchool = await getCoursesBySchool(params.id)
+
+  console.log(coursesOfSchool)
+
   if (!school) {
     return (
       <div>
@@ -43,8 +52,20 @@ export default async function SingleschoolPage({ params }: any) {
       <Link href="/koulut" className="text-blue-500 hover:underline">
         Takaisin
       </Link>
-      <h1 className="text-2xl font-bold my-4">Yksittäinen Koulu</h1>
-      <p>{school.name}</p>
+      <br></br>
+      <Link href={`/lisaa-kurssi/${school.id}`} className="text-blue-500 hover:underline">
+        Eikö kurssiasi ole täällä? Lisää se!
+      </Link>
+      <h1>{school.name} Kurssit</h1>
+      <ul className="pl-4">
+          {coursesOfSchool.map((course) => (
+            <li key={course.id} className="my-2">
+              <Link href={`/kurssit/${course.id}`}>
+                <p>{course.name}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
     </div>
   );
 }
