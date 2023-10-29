@@ -1,0 +1,45 @@
+import prisma from "@/db"
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
+import { authOptions } from "../api/auth/[...nextauth]/route"
+
+async function addCourse(data: FormData) {
+    "use server"
+
+    const session = await getServerSession(authOptions)
+
+    if (!session || !session.user || !session.user.email) {
+      throw new Error("Sinun tulee kirjautua sisään lisätäksesi arvostelu")
+    }
+
+    const name = data.get("coursename")?.valueOf()
+    if (typeof name !== "string" || name.length === 0) {
+        throw new Error("Invalid coursename")
+      }
+  
+      // luodaan relaatio käyttäjän uniikin sähköpostin perusteella
+    await prisma.course.create({ data: { name } })
+    redirect('/kiitos-kurssin-lisaamisesta')
+}
+
+export default function AddNewReview() {
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <h1 className="text-4xl font-bold">Lisää uusi kurssi</h1>
+      <form action={addCourse} className="flex items-center space-x-2">
+        <textarea
+          name="coursename"
+          className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
+          placeholder="Kirjoita kurssin nimi tähän"
+          rows={4} // Adjust the number of rows as needed
+        />
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Lisää
+        </button>
+      </form>
+    </div>
+  );
+}

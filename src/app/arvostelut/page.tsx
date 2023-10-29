@@ -2,20 +2,20 @@ import React, { useEffect } from 'react';
 import prisma from '@/db';
 import Link from 'next/link';
 
-function getCourses() {
-  return prisma.course.findMany()
+function getReviews() {
+  return prisma.review.findMany()
 }
 
-export default async function Courses() {
+export default async function Reviews() {
 
-  const courses = await getCourses()
+  const reviews = await getReviews()
     return (
       <div className="flex flex-col items-center space-y-4">
-        <h1 className="text-4xl font-bold">Kaikki kurssit</h1>
+        <h1 className="text-4xl font-bold">Kaikki arvostelut</h1>
         <div className="flex items-center space-x-2">
           <input
             type="text"
-            placeholder="Hae kursseja"
+            placeholder="Hae arvostelut"
             className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
           />
           <button
@@ -26,20 +26,21 @@ export default async function Courses() {
           </button>
         </div>
         <Link
-          href="/lisaa-kurssi"
+          href="/lisaa-arvostelu"
           className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
         >
-          Lisää kurssi
+          Lisää arvostelu
         </Link>
         <ul className="pl-4">
-          {courses.map((course) => (
-            <li key={course.id} className="my-2">
-              <Link href={`/kurssit/${course.id}`}>
-                <p>{course.name}</p>
+          {reviews.map((review) => (
+            <li key={review.id} className="my-2">
+              <Link href={`/kurssit/${review.id}`}>
+                <p>{review.description}</p>
               </Link>
             </li>
           ))}
         </ul>
+        <h1 className="text-2xl font-bold">Paljon arvosteluja saaneet kurssit</h1>
       </div>
     );
 }
