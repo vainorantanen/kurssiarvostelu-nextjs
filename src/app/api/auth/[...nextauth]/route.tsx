@@ -26,7 +26,6 @@ export const authOptions = {
             return null;
           }
 
-          console.log('logging in ', user)
           return user;
         } catch (error) {
           console.log("Error: ", error);

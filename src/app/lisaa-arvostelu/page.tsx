@@ -1,15 +1,29 @@
 import prisma from "@/db"
+import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
+import { authOptions } from "../api/auth/[...nextauth]/route"
 
 async function addReview(data: FormData) {
     "use server"
+
+    const session = await getServerSession(authOptions)
+
+    if (!session || !session.user || !session.user.email) {
+      throw new Error("Sinun tulee kirjautua sisään lisätäksesi arvostelu")
+    }
 
     const description = data.get("description")?.valueOf()
     if (typeof description !== "string" || description.length === 0) {
         throw new Error("Invalid description")
       }
-    
-    await prisma.review.create({ data: { description } })
+  
+      // luodaan relaatio käyttäjän uniikin sähköpostin perusteella
+    await prisma.review.create({ data: { description, 
+    user: {
+      connect: {
+        email: session.user.email
+      }
+    } } })
     redirect('/kiitos-arvostelusta')
 }
 
