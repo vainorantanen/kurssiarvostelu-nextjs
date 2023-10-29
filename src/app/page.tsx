@@ -1,9 +1,9 @@
 import prisma from '@/db';
 import Link from 'next/link';
 
-import LoginInfo from '@/components/LoginInfo'
 import { getServerSession } from 'next-auth';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import { authOptions } from './api/auth/[...nextauth]/options';
+
 
 function getReviews() {
   return prisma.review.findMany()

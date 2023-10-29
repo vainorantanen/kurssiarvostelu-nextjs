@@ -1,3 +1,4 @@
+/*
 "use client"
 
 type DeleteCourseProps = {
@@ -12,3 +13,4 @@ export default function DeleteCourseButton({ id, deleteCourse }: DeleteCoursePro
     </div>
   )
 }
+*/

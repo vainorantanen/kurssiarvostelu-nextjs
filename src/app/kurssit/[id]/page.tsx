@@ -1,4 +1,4 @@
-import DeleteCourseButton from "@/components/DeleteCourseButton";
+//import DeleteCourseButton from "@/components/DeleteCourseButton";
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -7,6 +7,7 @@ async function getCourse(courseId: string) {
   return prisma.course.findUnique({ where: { id: courseId } });
 }
 
+/*
 export async function deleteCourse(id: string) {
     "use server"
   
@@ -24,6 +25,7 @@ export async function deleteCourse(id: string) {
     }
   }
 
+  */
 export default async function SingleCoursePage({ params }: any) {
   const course = await getCourse(params.id);
 
@@ -46,7 +48,6 @@ export default async function SingleCoursePage({ params }: any) {
       </Link>
       <h1 className="text-2xl font-bold my-4">Yksittäinen Kurssi</h1>
       <p>{course.name}</p>
-        <DeleteCourseButton id={course.id} deleteCourse={deleteCourse}/>
         <Link href={`/lisaa-arvostelu/${course.id}`} className="text-blue-500 hover:underline">
         Arvostele tämä kurssi
       </Link>

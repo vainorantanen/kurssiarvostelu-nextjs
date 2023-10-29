@@ -2,7 +2,7 @@ import prisma from "@/db"
 import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import AddCourseForm from "@/components/AddCourseForm"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 
 async function getSchool(schoolId: string) {
   return prisma.school.findUnique({ where: { id: schoolId } })

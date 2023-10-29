@@ -1,10 +1,10 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import DeleteCourseButton from "@/components/DeleteCourseButton";
+//import DeleteCourseButton from "@/components/DeleteCourseButton";
 import { getServerSession } from "next-auth"
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import AddReviewButton from "@/components/AddReviewButton";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 async function getCourse(courseId: string) {
   return prisma.course.findUnique({ where: { id: courseId } });

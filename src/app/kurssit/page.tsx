@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
 import prisma from '@/db';
 import Link from 'next/link';
+//import { getCourses } from '../api/courses/route';
+//import CoursesList from '@/components/CoursesList';
 
 function getCourses() {
   return prisma.course.findMany()
 }
+
 
 export default async function Courses() {
 
@@ -32,7 +35,7 @@ export default async function Courses() {
           Lisää kurssi
         </Link>
         <ul className="pl-4">
-          {courses.map((course) => (
+          {courses.map((course: any) => (
             <li key={course.id} className="my-2">
               <Link href={`/kurssit/${course.id}`}>
                 <p>{course.name}</p>
