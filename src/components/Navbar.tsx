@@ -21,16 +21,6 @@ export default function Navbar() {
             </Link>
           </li>
           <li>
-            <Link href="/kurssit" className="text-white hover:text-blue-300">
-              Kurssit
-            </Link>
-          </li>
-          <li>
-            <Link href="/lisaa-arvostelu" className="text-white hover:text-blue-300">
-              Lisää arvostelu
-            </Link>
-          </li>
-          <li>
             <Link href="/login" className="text-white hover:text-blue-300">
               Kirjaudu
             </Link>

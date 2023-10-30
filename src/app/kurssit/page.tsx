@@ -1,19 +1,22 @@
-import React, { useEffect } from 'react';
-import prisma from '@/db';
-import Link from 'next/link';
-//import { getCourses } from '../api/courses/route';
+import React from 'react';
 //import CoursesList from '@/components/CoursesList';
+import Link from 'next/link';
+import { getCourses } from '../api/courses/route';
 
-function getCourses() {
-  return prisma.course.findMany()
-}
-
+type allCoursesReturn = {
+    id: string;
+    name: string;
+    schoolId: string | null;
+  }
 
 export default async function Courses() {
 
-  const courses = await getCourses()
+    const res = await getCourses()
+    const courses: allCoursesReturn[] = await res.json()
+
     return (
-      <div className="flex flex-col items-center space-y-4">
+        <>
+            <div className="flex flex-col items-center space-y-4">
         <h1 className="text-4xl font-bold">Kaikki kurssit</h1>
         <div className="flex items-center space-x-2">
           <input
@@ -35,15 +38,16 @@ export default async function Courses() {
           Lisää kurssi
         </Link>
         <ul className="pl-4">
-          {courses.map((course: any) => (
-            <li key={course.id} className="my-2">
-              <Link href={`/kurssit/${course.id}`}>
-                <p>{course.name}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {courses.map((course) => (
+        <li key={course.id} className="my-2">
+          <Link href={`/kurssit/${course.id}`}>
+            <p>{course.name}</p>
+          </Link>
+        </li>
+      ))}
+    </ul>
+    </div>
+        </>
     );
 }
 

@@ -3,7 +3,12 @@ import Link from 'next/link';
 
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]/options';
+import FrontPageSearch from '@/components/FrontPageSearch';
 
+type School = {
+  id: string;
+  name: string;
+};
 
 function getReviews() {
   return prisma.review.findMany()
@@ -27,24 +32,11 @@ export default async function Home() {
 
   const courses = await getCourses()
 
-  const schools = await getSchools()
+  const schools: School[] = await getSchools()
 
     return (
       <div className="flex flex-col items-center space-y-4">
         <h1 className="text-4xl font-bold">Tervetuloa</h1>
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Hae kursseja"
-            className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            disabled // Add functionality here when needed
-          >
-            Etsi
-          </button>
-        </div>
         <Link
           href="/lisaa-arvostelu"
           className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
@@ -63,22 +55,7 @@ export default async function Home() {
         >
           Lisää koulu
         </Link>
-        <Link
-          href="/kurssit"
-          className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
-        >
-          Selaa kursseja
-        </Link>
-        <h1 className="text-2xl font-bold">Koulut</h1>
-        <ul className="pl-4">
-          {schools.map((school) => (
-            <li key={school.id} className="my-2">
-              <Link href={`/koulut/${school.id}`}>
-                <p>{school.name}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <FrontPageSearch initialSchools={schools}/>
         <h1 className="text-2xl font-bold">Kurssit</h1>
         <ul className="pl-4">
           {courses.map((course) => (

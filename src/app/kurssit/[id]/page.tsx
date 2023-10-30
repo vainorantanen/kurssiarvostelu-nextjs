@@ -7,6 +7,10 @@ async function getCourse(courseId: string) {
   return prisma.course.findUnique({ where: { id: courseId } });
 }
 
+async function getReviewsByCourse(courseId: string) {
+  return prisma.review.findMany({ where: { courseId } })
+}
+
 /*
 export async function deleteCourse(id: string) {
     "use server"
@@ -28,6 +32,9 @@ export async function deleteCourse(id: string) {
   */
 export default async function SingleCoursePage({ params }: any) {
   const course = await getCourse(params.id);
+
+  const reviewsOfCourse = await getReviewsByCourse(params.id)
+
 
   if (!course) {
     return (
@@ -51,6 +58,16 @@ export default async function SingleCoursePage({ params }: any) {
         <Link href={`/lisaa-arvostelu/${course.id}`} className="text-blue-500 hover:underline">
         Arvostele tämä kurssi
       </Link>
+      <h2>Arvostelut</h2>
+      <ul className="pl-4">
+          {reviewsOfCourse.map((review) => (
+            <li key={review.id} className="my-2">
+              <Link href={`/arvostelut/${review.id}`}>
+                <p>{review.description}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
     </div>
   );
 }
