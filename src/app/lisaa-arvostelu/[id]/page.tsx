@@ -3,14 +3,15 @@ import { getServerSession } from "next-auth"
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import AddReviewButton from "@/components/AddReviewButton";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import AddReviewForm from "@/components/AddReviewForm";
 
 async function getCourse(courseId: string) {
   return prisma.course.findUnique({ where: { id: courseId } });
 }
 
-async function addReview(description: string, courseId: string) {
+async function addReview(description: string, courseId: string, 
+  rating: number, grade: number) {
   "use server"
 
   const session = await getServerSession(authOptions)
@@ -20,14 +21,17 @@ async function addReview(description: string, courseId: string) {
   }
 
   if (typeof description !== "string" || description.length === 0 || 
-  typeof courseId !== "string" || courseId.length === 0) {
+  typeof courseId !== "string" || courseId.length === 0
+  || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number') {
       throw new Error("Invalid inputs")
     }
 
     // luodaan relaatio käyttäjän uniikin sähköpostin perusteella
 
     // kannattais tarkistaa viä että kurssi on olemassa?
-  await prisma.review.create({ data: { description, 
+  await prisma.review.create({ data: { description,
+    rating,
+    grade,
   user: {
     connect: {
       email: session.user.email
@@ -65,7 +69,7 @@ export default async function SingleCoursePage({ params }: any) {
       <h1 className="text-2xl font-bold my-4">Arvostele kurssi</h1>
       <p>{course.name}</p>
       <div>
-        <AddReviewButton id={course.id} addReview={addReview}/>
+        <AddReviewForm id={course.id} addReview={addReview}/>
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ const FrontPageSearch: React.FC<FrontPageSearchProps> = ({ initialSchools }) => 
         {schools.map((school) => (
           <li key={school.id} className="my-2">
              <Link href={`/koulut/${school.id}`}>
-              <a>{school.name}</a> {/* Use <a> tag inside Link */}
+              {school.name}
             </Link>
           </li>
         ))}

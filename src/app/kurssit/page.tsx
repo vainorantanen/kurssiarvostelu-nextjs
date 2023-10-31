@@ -1,52 +1,16 @@
 import React from 'react';
 //import CoursesList from '@/components/CoursesList';
 import Link from 'next/link';
-import { getCourses } from '../api/courses/route';
-
-type allCoursesReturn = {
-    id: string;
-    name: string;
-    schoolId: string | null;
-  }
+import prisma from '@/db';
+//import { getCourses } from '../api/courses/route';
 
 export default async function Courses() {
-
-    const res = await getCourses()
-    const courses: allCoursesReturn[] = await res.json()
 
     return (
         <>
             <div className="flex flex-col items-center space-y-4">
-        <h1 className="text-4xl font-bold">Kaikki kurssit</h1>
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Hae kursseja"
-            className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            disabled // Add functionality here when needed
-          >
-            Etsi
-          </button>
+        <h1 className="text-4xl font-bold">Alustallamme on paljon kursseja</h1>
         </div>
-        <Link
-          href="/lisaa-kurssi"
-          className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
-        >
-          Lisää kurssi
-        </Link>
-        <ul className="pl-4">
-      {courses.map((course) => (
-        <li key={course.id} className="my-2">
-          <Link href={`/kurssit/${course.id}`}>
-            <p>{course.name}</p>
-          </Link>
-        </li>
-      ))}
-    </ul>
-    </div>
         </>
     );
 }

@@ -1,3 +1,4 @@
+import SearchCourses from "@/components/SearchCourses";
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -9,6 +10,10 @@ async function getSchool(schoolId: string) {
 async function getCoursesBySchool(schoolId: string) {
   return prisma.course.findMany({where: { schoolId }})
   
+}
+
+async function getAllReviews() {
+  return prisma.review.findMany()
 }
 /*
 export async function deleteschool(id: string) {
@@ -28,10 +33,11 @@ export async function deleteschool(id: string) {
     }
   }
 */
+
 export default async function SingleschoolPage({ params }: any) {
   const school = await getSchool(params.id);
-
-  const coursesOfSchool = await getCoursesBySchool(params.id)
+  const coursesOfSchool = await getCoursesBySchool(params.id);
+  const allReviews = await getAllReviews()
 
   console.log(coursesOfSchool)
 
@@ -42,7 +48,7 @@ export default async function SingleschoolPage({ params }: any) {
           Takaisin
         </Link>
         <h1 className="text-2xl font-bold mt-4">Yksittäinen Koulu</h1>
-        <p className="text-gray-700">koulua ei löytynyt.</p>
+        <p className="text-gray-700">Koulua ei löytynyt.</p>
       </div>
     );
   }
@@ -56,16 +62,9 @@ export default async function SingleschoolPage({ params }: any) {
       <Link href={`/lisaa-kurssi/${school.id}`} className="text-blue-500 hover:underline">
         Eikö kurssiasi ole täällä? Lisää se!
       </Link>
-      <h1>{school.name} Kurssit</h1>
-      <ul className="pl-4">
-          {coursesOfSchool.map((course) => (
-            <li key={course.id} className="my-2">
-              <Link href={`/kurssit/${course.id}`}>
-                <p>{course.name}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      <h1 className="text-2xl mt-4">{school.name} Kurssit</h1>
+      <SearchCourses initialCourses={coursesOfSchool} allReviews={allReviews}/>
     </div>
   );
 }
+
