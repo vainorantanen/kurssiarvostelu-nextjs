@@ -3,6 +3,10 @@
 import { useState } from "react";
 import Link from 'next/link';
 import { Review } from "@prisma/client";
+import { FaStar } from "react-icons/fa";
+import notebookImage from '@/Assets/book.png'
+import Image from 'next/image';
+
 
 type Course = {
     id: string;
@@ -60,20 +64,43 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                     {sortedCourses.map((course) => {
                         const reviewsOfCourse = allReviews.filter(r => r.courseId === course.id);
                         const reviewCount = reviewsOfCourse.length;
+                        const sum = reviewsOfCourse.reduce((acc, review) => acc + review.grade, 0);
+                        const averageRating = reviewCount > 0 ? sum / reviewCount : 0;
 
                         return (
                             <div
-                                key={course.id}
-                                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg"
+                              key={course.id}
+                              className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center"
                             >
+                              <div className="mr-4">
                                 <Link href={`/kurssit/${course.id}`}>
-                                    <p className="text-lg font-semibold text-blue-500 hover:underline">
-                                        {course.name}
-                                    </p>
-                                    <p className="text-black">{reviewCount} {reviewCount === 1 ? 'Arvostelu' : 'Arvostelua'}</p>
+                                  <div className="relative w-16 h-16">
+                                    <Image
+                                      src={notebookImage}
+                                      alt="Notebook"
+                                      layout="fill"
+                                      objectFit="cover"
+                                      className="rounded-full"
+                                    />
+                                  </div>
                                 </Link>
+                              </div>
+                              <div>
+                                <Link href={`/kurssit/${course.id}`}>
+                                  <p className="text-lg font-semibold text-blue-500 hover:underline">
+                                    {course.name}
+                                  </p>
+                                  <p className="text-black">{reviewCount} {reviewCount === 1 ? 'Arvostelu' : 'Arvostelua'}</p>
+                                  <div className="flex items-center text-black">
+                                    <p className="mr-2">{averageRating.toFixed(1)} tähteä</p>
+                                    {[...Array(Math.round(averageRating))].map((_, index) => (
+                                      <FaStar key={index} className="text-yellow-500" />
+                                    ))}
+                                  </div>
+                                </Link>
+                              </div>
                             </div>
-                        );
+                          );
                     })}
                 </div>
             </div>

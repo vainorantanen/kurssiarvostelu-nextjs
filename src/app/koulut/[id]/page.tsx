@@ -11,10 +11,6 @@ async function getVisibleCoursesBySchool(schoolId: string) {
   return prisma.course.findMany({where: { schoolId, isVisible: true }}) 
 }
 
-async function getHiddenCoursesBySchool(schoolId: string) {
-  return prisma.course.findMany({where: { schoolId, isVisible: false }}) 
-}
-
 async function getAllReviews() {
   return prisma.review.findMany()
 }
@@ -42,7 +38,6 @@ export default async function SingleschoolPage({ params }: any) {
   const allReviews = await getAllReviews()
 
   const visibleCoursesOfSchool = await getVisibleCoursesBySchool(params.id);
-  const hiddenCoursesOfSchool = await getHiddenCoursesBySchool(params.id);
 
   if (!school) {
     return (
@@ -57,15 +52,16 @@ export default async function SingleschoolPage({ params }: any) {
   }
 
   return (
-    <div className="text-center">
-      <Link href="/koulut" className="text-blue-500 hover:underline">
-        Takaisin
-      </Link>
-      <br></br>
-      <Link href={`/lisaa-kurssi/${school.id}`} className="text-blue-500 hover:underline">
-        Eikö kurssiasi ole täällä? Lisää se!
-      </Link>
-      <h1 className="text-2xl mt-4">{school.name} Kurssit</h1>
+    <div>
+      <div className="mt-2">
+      <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+    <Link href='/'>Takaisin</Link>
+  </button>
+  <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+    <Link href={`/lisaa-kurssi/${school.id}`}>Eikö kurssiasi ole täällä? Lisää se!</Link>
+  </button>
+  </div>
+      <h1 className="text-2xl mt-4 mb-2">{school.name} Kurssit</h1>
       <SearchCourses initialCourses={visibleCoursesOfSchool} allReviews={allReviews}/>
     </div>
   );
