@@ -8,8 +8,8 @@ async function addSchool(data: FormData) {
 
     const session = await getServerSession(authOptions)
 
-    if (!session || !session.user || !session.user.email) {
-      throw new Error("Sinun tulee kirjautua sisään lisätäksesi arvostelu")
+    if (!session || !session.user || session.user.email !== 'admin@moi.fi') {
+      throw new Error("Vain admin voi lisätä koulun")
     }
 
     const name = data.get("schoolname")?.valueOf()
@@ -26,7 +26,7 @@ export default function AddNewSchool() {
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1 className="text-4xl font-bold">Lisää uusi koulu</h1>
-      <div className="flex flex-col items-center space-y-2">
+        <form action={addSchool} className="flex flex-col items-center space-y-2">
         <textarea
           name="schoolname"
           className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
@@ -39,7 +39,7 @@ export default function AddNewSchool() {
         >
           Lisää
         </button>
-      </div>
+        </form>
     </div>
   );
 }

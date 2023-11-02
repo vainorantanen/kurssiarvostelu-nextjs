@@ -32,6 +32,8 @@ model User {
 model Course {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   name String
+  courseCode String
+  isVisible Boolean @default(false)
   reviews Review[]
   school        School?     @relation(fields: [schoolId], references: [id])
   schoolId      String?   @db.ObjectId

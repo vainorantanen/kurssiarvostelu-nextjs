@@ -7,9 +7,12 @@ async function getSchool(schoolId: string) {
   return prisma.school.findUnique({ where: { id: schoolId } });
 }
 
-async function getCoursesBySchool(schoolId: string) {
-  return prisma.course.findMany({where: { schoolId }})
-  
+async function getVisibleCoursesBySchool(schoolId: string) {
+  return prisma.course.findMany({where: { schoolId, isVisible: true }}) 
+}
+
+async function getHiddenCoursesBySchool(schoolId: string) {
+  return prisma.course.findMany({where: { schoolId, isVisible: false }}) 
 }
 
 async function getAllReviews() {
@@ -36,10 +39,10 @@ export async function deleteschool(id: string) {
 
 export default async function SingleschoolPage({ params }: any) {
   const school = await getSchool(params.id);
-  const coursesOfSchool = await getCoursesBySchool(params.id);
   const allReviews = await getAllReviews()
 
-  console.log(coursesOfSchool)
+  const visibleCoursesOfSchool = await getVisibleCoursesBySchool(params.id);
+  const hiddenCoursesOfSchool = await getHiddenCoursesBySchool(params.id);
 
   if (!school) {
     return (
@@ -63,7 +66,7 @@ export default async function SingleschoolPage({ params }: any) {
         Eikö kurssiasi ole täällä? Lisää se!
       </Link>
       <h1 className="text-2xl mt-4">{school.name} Kurssit</h1>
-      <SearchCourses initialCourses={coursesOfSchool} allReviews={allReviews}/>
+      <SearchCourses initialCourses={visibleCoursesOfSchool} allReviews={allReviews}/>
     </div>
   );
 }

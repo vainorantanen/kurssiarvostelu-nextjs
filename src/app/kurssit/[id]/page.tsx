@@ -64,6 +64,8 @@ export async function deleteCourse(id: string) {
                   <Link href={`/arvostelut/${review.id}`} className="text-blue-500 hover:underline">
                     <p className="text-black">{review.description}</p>
                   </Link>
+                  <p className="text-black">Arvostelu {review.rating}</p>
+                  <p className="text-black">Saatu arvosana {review.grade}</p>
                 </div>
               ))}
             </div>

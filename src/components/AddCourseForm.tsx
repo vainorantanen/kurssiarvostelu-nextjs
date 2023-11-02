@@ -5,16 +5,17 @@ import { useState } from "react";
 type AddCourseProps = {
   id: string
   schoolName: string
-  addCourse: (name: string, schoolId: string) => void;
+  addCourse: (name: string, schoolId: string, courseCode: string) => void;
 };
 
 export default function AddCourseForm({ id, schoolName, addCourse }: AddCourseProps) {
   const [name, setName] = useState(""); // Corrected the variable name
+  const [courseCode, setCourseCode] = useState("");
 
   const handleaddCourse = () => {
     // Check if name is not empty before adding the review
     if (name.trim() !== "") {
-      addCourse(name, id);
+      addCourse(name, id, courseCode);
       setName(""); // Clear the textarea after adding the review
     }
   };
@@ -27,10 +28,18 @@ export default function AddCourseForm({ id, schoolName, addCourse }: AddCoursePr
         <textarea
           name="name"
           className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
-          placeholder="Kirjoita kurssin nimi tähän"
+          placeholder="Kurssin nimi"
           rows={4}
           value={name} // Bind textarea value to the name state
           onChange={(e) => setName(e.target.value)} // Update name state on change
+        />
+        <textarea
+          name="courseCode"
+          className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
+          placeholder="Kurssikoodi"
+          rows={4}
+          value={courseCode}
+          onChange={(e) => setCourseCode(e.target.value)} 
         />
         <button onClick={handleaddCourse}>Lisää</button>
       </div>
