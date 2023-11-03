@@ -17,7 +17,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState(0);
   const [grade, setGrade] = useState(5); // Initialize grade as an empty string
-  const [year, setYear] = useState("1st year"); // Initial year value
+  const [year, setYear] = useState("1. vuonna"); // Initial year value
 
   const handleAddReview = () => {
     // Check if grade is a number and between 1 and 5
@@ -32,7 +32,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
       setDescription("");
       setRating(0);
       setGrade(5); // Reset grade to an empty string
-      setYear("1st year"); // Reset year to the initial value
+      setYear("1. vuonna"); // Reset year to the initial value
     }
   };
 
@@ -88,13 +88,13 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
           onChange={(e) => setYear(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
         >
-          <option value="1st year">1. vuonna</option>
-          <option value="2nd year">2. vuonna</option>
-          <option value="3rd year">3. vuonna</option>
-          <option value="4th year">4. vuonna</option>
-          <option value="5th year">5. vuonna</option>
-          <option value="6th year">6. vuonna</option>
-          <option value="nth year">N. vuonna</option>
+          <option value="1. vuonna">1. vuonna</option>
+          <option value="2. vuonna">2. vuonna</option>
+          <option value="3. vuonna">3. vuonna</option>
+          <option value="4. vuonna">4. vuonna</option>
+          <option value="5. vuonna">5. vuonna</option>
+          <option value="6. vuonna">6. vuonna</option>
+          <option value="N. vuonna">N. vuonna</option>
         </select>
       </div>
 

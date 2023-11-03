@@ -64,7 +64,7 @@ export default async function SingleCoursePage({ params }: any) {
   }
 
   return (
-    <div className="text-center mt-3">
+    <div className="text-center mt-3 min-h-screen">
       <Link href={`/kurssit/${course.id}`} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
         Takaisin
       </Link>

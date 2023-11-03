@@ -42,7 +42,7 @@ if (!school) {
 }
 
 return (
-  <div className="flex flex-col items-center space-y-4">
+  <div className="flex flex-col items-center space-y-4 min-h-screen">
     <div>
       <AddCourseForm id={school.id} schoolName={school.name} addCourse={addCourse}/>
     </div>

@@ -15,10 +15,6 @@ type School = {
   name: string;
 };
 
-function getReviews() {
-  return prisma.review.findMany()
-}
-
 function getVisibleCourses() {
   return prisma.course.findMany( { where: {
     isVisible: true
@@ -51,8 +47,6 @@ export default async function Home() {
 
   console.log("session at Home", session)
 
-  const reviews = await getReviews()
-
   const visibleCourses = await getVisibleCourses()
   const nonVisibleCourses = await getNonVisibleCourses()
 
@@ -60,8 +54,8 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1 className="text-4xl font-bold">Tervetuloa</h1>
-      {session && session.user?.email === 'admin@moi.fi' && (
+      <h1 className="text-4xl my-4 font-bold">Femmat.fi</h1>
+      {session && session.user?.email === process.env.ADMIN && (
         <Link
           href="/lisaa-koulu"
           className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
@@ -69,24 +63,28 @@ export default async function Home() {
           Lisää koulu
         </Link>
       )}
-      <div  className="relative h-64">
+      <div className="h-64">
         <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.localeCompare(b.name))}/>
         </div>
-      <div className="flex flex-col gap-4 my-4 mt-4">
+      <div className="flex flex-col gap-4 my-4 mt-4 container">
         <div className="flex items-center gap-4">
         <div className="relative w-48 h-48">
         <Image
         src={booksPic}
-        alt="Notebook"
+        alt="Books"
         />
          </div>
           <div className="ml-2">
-            <p>Text for Picture 1</p>
+              <h1 className='text-2xl mb-3'>Etsi koulusi</h1>
+              <p>Hakemalla kursseja koulusi perusteella, löydät ne nopeiten.</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="mr-2">
-            <p>Text for Picture 2</p>
+            <h1 className='text-2xl mb-3'>Katso kurssien arvosteluja</h1>
+            <p>Tutki, mitä mieltä muut ovat kurssista olleet ja milloin he ovat sen suorittaneet.
+              Voit myös kirjoittaa oman arvostelusi täysin anonyymisti!
+            </p>
           </div>
           <div className="relative w-48 h-48">
           <Image
@@ -106,7 +104,7 @@ export default async function Home() {
           </li>
         ))}
       </ul>
-      {session && session.user?.email === 'admin@moi.fi' && (
+      {session && session.user?.email === process.env.ADMIN && (
         <div>
           <h1 className="text-2xl font-bold">Hyväksymättömät kurssit</h1>
           <ul className="pl-4">
@@ -121,16 +119,6 @@ export default async function Home() {
           </ul>
         </div>
       )}
-      <h1 className="text-2xl font-bold">Arvostelut</h1>
-      <ul className="pl-4">
-        {reviews.map((review) => (
-          <li key={review.id} className="my-2">
-            <Link href={`/arvostelut/${review.id}`}>
-              <p>{review.description}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

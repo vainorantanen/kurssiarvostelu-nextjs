@@ -64,6 +64,22 @@ export async function deleteCourse(id: string) {
           gradeCounts[review.grade.toString()]++;
         });
 
+        const yearCounts: Record<string, number> = {
+          'N. vuonna': 0,
+          '6. vuonna': 0,
+          '5. vuonna': 0,
+          '4. vuonna': 0,
+          '3. vuonna': 0,
+          '2. vuonna': 0,          
+          '1. vuonna': 0,
+        };
+
+        reviewsOfCourse.forEach((review) => {
+          if (review.year) {
+            yearCounts[review.year.toString()]++
+          }
+         })
+
         return (
           <div className="min-h-screen flex flex-col md:flex-row">
             {/* Summary and Chart on small screens (1/3 width) */}
@@ -117,6 +133,27 @@ export async function deleteCourse(id: string) {
   })}
 </div>
 
+<p className="mt-2 text-xl font-bold">Kurssien suoritusajankohdat</p>
+              <div className="mt-4">
+  {Object.keys(yearCounts).reverse().map((year) => {
+    const yearCount = yearCounts[year];
+    const maxYearCount = Math.max(...Object.values(yearCounts));
+    const barWidth = maxYearCount === 0 ? '0%' : `${(yearCount / maxYearCount) * 100}%`;
+    return (
+      <div key={year} className="grade-bar flex items-center text-white mt-1">
+        <div className="w-1/4 text-right pr-2">{year} </div>
+        <div className={`w-2/4 ${yearCount > 0 ? 'bg-blue-200 rounded' : 'bg-gray-300 rounded'}`}>
+          <div
+            className="h-4"
+            style={{ width: barWidth, backgroundColor: 'blue', borderRadius: '0.2rem' }}
+          ></div>
+        </div>
+        <div className="w-1/4 pl-2 text-right">{yearCount} kpl</div>
+      </div>
+    );
+  })}
+</div>
+
             </div>
         
             {/* Reviews on small screens (2/3 width) */}
@@ -126,9 +163,9 @@ export async function deleteCourse(id: string) {
                 {/* Reviews */}
                 { reviewsOfCourse.length > 0 ? (
                   reviewsOfCourse.map((review) => (
-                    <div key={review.id} className="bg-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg">
+                    <div key={review.id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg">
     
-                        <p className="text-black mb-2">{review.description}</p>
+                        <p className="text-black mb-2 whitespace-break-spaces">{review.description}</p>
     
                       <div className="flex items-center text-black">
                         <p className="mr-2">Arvostelu</p>
