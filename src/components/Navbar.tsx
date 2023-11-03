@@ -65,12 +65,12 @@ export default function Navbar() {
         <div className="md:hidden text-white">
           <ul className="flex flex-col items-center mt-4 space-y-4">
             <li>
-              <button className="hover:text-blue-300 hover:underline">
-                <Link href="/">Etusivu</Link>
-              </button>
+            <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+            <Link href="/">Etusivu</Link>
+          </button>
             </li>
             <li>
-              <button className="hover:text-blue-300 hover:underline">
+              <button  className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
                 <Link href="/login">Kirjaudu</Link>
               </button>
             </li>

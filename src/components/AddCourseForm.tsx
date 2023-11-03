@@ -17,31 +17,37 @@ export default function AddCourseForm({ id, schoolName, addCourse }: AddCoursePr
     if (name.trim() !== "") {
       addCourse(name, id, courseCode);
       setName(""); // Clear the textarea after adding the review
+      setCourseCode("")
     }
   };
 
   return (
-    <div className="flex flex-col gap-4 items-center space-x-2">
-        <h1 className="text-4xl font-bold">Lisää uusi kurssi</h1>
-        <h2>Koululle: {schoolName}</h2>
-        <div className="flex flex-col items-center space-y-2">
-        <textarea
+    <div className="flex flex-col items-center">
+      <h1 className="text-3xl font-bold text-white mb-2">Lisää uusi kurssi</h1>
+      <h2 className="text-xl font-semibold my-2 text-white-600">Koululle: {schoolName}</h2>
+      <div className="flex flex-col gap-4">
+        <input
+          type="text"
           name="name"
-          className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
+          className="w-64 px-3 py-2 border rounded focus:outline-none text-black"
           placeholder="Kurssin nimi"
-          rows={4}
-          value={name} // Bind textarea value to the name state
-          onChange={(e) => setName(e.target.value)} // Update name state on change
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
-        <textarea
+        <input
+          type="text"
           name="courseCode"
-          className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
+          className="w-64 px-3 py-2 border rounded focus:outline-none text-black"
           placeholder="Kurssikoodi"
-          rows={4}
           value={courseCode}
-          onChange={(e) => setCourseCode(e.target.value)} 
+          onChange={(e) => setCourseCode(e.target.value)}
         />
-        <button onClick={handleaddCourse}>Lisää</button>
+        <button
+          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          onClick={handleaddCourse}
+        >
+          Lisää
+        </button>
       </div>
     </div>
   );

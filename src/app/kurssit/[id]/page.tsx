@@ -77,12 +77,24 @@ export async function deleteCourse(id: string) {
   </button>
         
               <h2 className="text-2xl font-bold text-white mt-4 mb-2">Yhteenveto</h2>
-              <p className="text-white">Keskiarvo {averageRating.toFixed(1)} tähteä</p>
-              <div className="flex items-center text-black">
+              {averageRating > 0 ? (
+                <p className="text-white">Keskiarvo {averageRating.toFixed(1)} tähteä</p>
+              ) : (
+                <p className="text-white">Ei vielä arvosteluja</p>
+              )}
+              {Math.round(averageRating) > 0 ? (
+                <div className="flex items-center text-black">
                 {[...Array(Math.round(averageRating))].map((_, index) => (
                   <FaStar key={index} className="text-yellow-500" />
                 ))}
               </div>
+              ) : (
+                <div className="flex items-center text-black">
+                {[...Array(Math.round(5))].map((_, index) => (
+                  <FaStar key={index} className="text-gray-500" />
+                ))}
+              </div>
+              )}
               <p className="mt-2 text-xl font-bold">Vastanneiden saamat arvosanat</p>
               <div className="mt-4">
   {Object.keys(gradeCounts).reverse().map((grade) => {
@@ -112,20 +124,24 @@ export async function deleteCourse(id: string) {
               <h2 className="text-2xl font-bold text-white mt-4 mb-2">Arvostelut</h2>
               <div className="grid grid-cols-1 gap-4">
                 {/* Reviews */}
-                {reviewsOfCourse.map((review) => (
-                  <div key={review.id} className="bg-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg">
-  
-                      <p className="text-black mb-2">{review.description}</p>
-  
-                    <div className="flex items-center text-black">
-                      <p className="mr-2">Arvostelu</p>
-                      {[...Array(review.rating)].map((_, index) => (
-                        <FaStar key={index} className="text-yellow-500" />
-                      ))}
+                { reviewsOfCourse.length > 0 ? (
+                  reviewsOfCourse.map((review) => (
+                    <div key={review.id} className="bg-gray-300 p-4 rounded-lg shadow-md hover:shadow-lg">
+    
+                        <p className="text-black mb-2">{review.description}</p>
+    
+                      <div className="flex items-center text-black">
+                        <p className="mr-2">Arvostelu</p>
+                        {[...Array(review.rating)].map((_, index) => (
+                          <FaStar key={index} className="text-yellow-500" />
+                        ))}
+                      </div>
+                      <p className="text-black">Saatu arvosana {review.grade}</p>
                     </div>
-                    <p className="text-black">Saatu arvosana {review.grade}</p>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-white mb-2">Ei vielä arvosteluja</p>
+                ) }
               </div>
             </div>
           </div>

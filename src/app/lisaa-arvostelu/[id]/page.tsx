@@ -11,7 +11,7 @@ async function getCourse(courseId: string) {
 }
 
 async function addReview(description: string, courseId: string, 
-  rating: number, grade: number) {
+  rating: number, grade: number, year: string) {
   "use server"
 
   const session = await getServerSession(authOptions)
@@ -22,7 +22,8 @@ async function addReview(description: string, courseId: string,
 
   if (typeof description !== "string" || description.length === 0 || 
   typeof courseId !== "string" || courseId.length === 0
-  || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number') {
+  || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number'
+  || !year || typeof year !== 'string') {
       throw new Error("Invalid inputs")
     }
 
@@ -32,6 +33,7 @@ async function addReview(description: string, courseId: string,
   await prisma.review.create({ data: { description,
     rating,
     grade,
+    year,
   user: {
     connect: {
       email: session.user.email
@@ -62,12 +64,11 @@ export default async function SingleCoursePage({ params }: any) {
   }
 
   return (
-    <div className="text-center">
-      <Link href="/kurssit" className="text-blue-500 hover:underline">
+    <div className="text-center mt-3">
+      <Link href={`/kurssit/${course.id}`} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
         Takaisin
       </Link>
-      <h1 className="text-2xl font-bold my-4">Arvostele kurssi</h1>
-      <p>{course.name}</p>
+      <h1 className="text-2xl font-bold my-4">Arvostele {course.name}</h1>
       <div>
         <AddReviewForm id={course.id} addReview={addReview}/>
       </div>

@@ -64,7 +64,7 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                     {sortedCourses.map((course) => {
                         const reviewsOfCourse = allReviews.filter(r => r.courseId === course.id);
                         const reviewCount = reviewsOfCourse.length;
-                        const sum = reviewsOfCourse.reduce((acc, review) => acc + review.grade, 0);
+                        const sum = reviewsOfCourse.reduce((acc, review) => acc + review.rating, 0);
                         const averageRating = reviewCount > 0 ? sum / reviewCount : 0;
 
                         return (
