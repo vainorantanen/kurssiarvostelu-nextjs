@@ -14,11 +14,11 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-500 p-4">
+    <nav className="p-4">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <button className="text-white text-2xl font-bold hover:underline">
-            <Link href="/">Your Logo</Link>
+            <Link href="/">Femmat.fi</Link>
           </button>
         </div>
         <div className="hidden md:flex space-x-4">
@@ -30,7 +30,7 @@ export default function Navbar() {
           </button>
           {session ? (
             <span className="text-white">
-              Kirjautunut: <span className="text-black font-semibold">{session?.user?.name}</span>
+              Kirjautunut: <span className="text-white font-semibold">{session?.user?.name}</span>
             </span>
           ) : null}
           {session ? (
@@ -77,7 +77,7 @@ export default function Navbar() {
             {session && (
               <li>
                 Kirjautunut:{" "}
-                <span className="text-black font-semibold">{session?.user?.name}</span>
+                <span className="text-white font-semibold">{session?.user?.name}</span>
               </li>
             )}
             {session ? (

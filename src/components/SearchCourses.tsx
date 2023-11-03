@@ -16,9 +16,10 @@ type Course = {
 type CourseSearchProps = {
     initialCourses: Course[];
     allReviews: Review[];
+    schoolId: string
 };
 
-const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews }) => {
+const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews, schoolId }) => {
     const [sortBy, setSortBy] = useState(""); // State for sorting
     const [searchQuery, setSearchQuery] = useState(""); // State for search
 
@@ -61,7 +62,8 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
             </div>
             <div className="md:col-span-2">
                 <div className="grid grid-cols-1 gap-4">
-                    {sortedCourses.map((course) => {
+                    {filteredCourses.length > 0 ? (
+                      sortedCourses.map((course) => {
                         const reviewsOfCourse = allReviews.filter(r => r.courseId === course.id);
                         const reviewCount = reviewsOfCourse.length;
                         const sum = reviewsOfCourse.reduce((acc, review) => acc + review.rating, 0);
@@ -101,7 +103,15 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                               </div>
                             </div>
                           );
-                    })}
+                    })
+                    ) : (
+                      <div className="text-center">
+                      <p className="text-2xl mb-2">Ei löytyny kursseja :(</p>
+                      <Link
+                        className="bg-blue-500 text-white font-semibold py-1 px-1 rounded hover:bg-blue-600"
+                        href={`/lisaa-kurssi/${schoolId}`}>Lisää</Link> sä eka!
+                      </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@ async function addSchool(data: FormData) {
 
     const session = await getServerSession(authOptions)
 
-    if (!session || !session.user || session.user.email !== 'admin@moi.fi') {
+    if (!session || !session.user || session.user.email !== process.env.ADMIN) {
       throw new Error("Vain admin voi lisätä koulun")
     }
 

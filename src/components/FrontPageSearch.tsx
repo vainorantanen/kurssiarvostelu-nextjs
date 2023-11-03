@@ -31,26 +31,35 @@ const FrontPageSearch: React.FC<FrontPageSearchProps> = ({ initialSchools }) => 
   };
 
   return (
-    <div className="relative">
+    <div className="w-full md:w-96">
       <input
         type="text"
         placeholder="Hae koulua"
-        className="px-3 py-2 border rounded w-96 shadow focus:outline-none text-black"
+        className="px-3 py-2 border rounded w-full sm:w-96 shadow focus:outline-none text-black"
         value={searchTerm}
         onChange={handleSearch}
         onClick={() => setIsMenuOpen(true)}
       />
       {isMenuOpen && schools.length > 0 && (
-        <div className="absolute text-black top-full left-0 w-96 max-h-40 bg-white border rounded shadow mt-2 max-h-[60vh] overflow-y-auto">
+        <div>
+        <div className="text-black left-0 w-full md:w-96 max-h-40 bg-white border rounded shadow mt-2 overflow-y-auto">
           <ul>
             {schools.map((school, index) => (
               <li key={school.id} className="my-2">
-                <Link href={`/koulut/${school.id}`}
-                className="hover:text-blue-500">{school.name}</Link>
+                <Link href={`/koulut/${school.id}`} className="hover:text-blue-500">
+                  {school.name}
+                </Link>
               </li>
             ))}
           </ul>
         </div>
+        <button
+        onClick={() => setIsMenuOpen(false)}
+        className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 mt-2"
+      >
+        Sulje
+      </button>
+      </div>
       )}
     </div>
   );
