@@ -10,6 +10,7 @@ import schoolImage from '@/Assets/school.png'
 import booksPic from '@/Assets/books.png'
 import geometryPic from '@/Assets/geometry.png'
 import anonymPic from '@/Assets/anonym.png'
+import { redirect } from 'next/navigation';
 
 type School = {
   id: string;
@@ -36,6 +37,8 @@ async function makeCourseVisible(courseId: string) {
     where: { id: courseId },
     data: { isVisible: true }
   });
+
+  redirect('/kiitos-kurssin-lisaamisesta')
 }
 
 
@@ -137,8 +140,9 @@ export default async function Home() {
             {nonVisibleCourses.map((course) => (
               <li key={course.id} className="my-2">
                 <Link href={`/kurssit/${course.id}`}>
-                  <p>{course.name}, {course.courseCode}</p>
+                  <p>{course.name}, {course.courseCode}, {schools.find(s => s.id === course.schoolId)?.name}</p>
                 </Link>
+                <p>Kieli: {course.lang}, {course.minCredits} - {course.maxCredits}op</p>
                 <MakeCourseVisible id={course.id} makeCourseVisible={makeCourseVisible}/>
               </li>
             ))}

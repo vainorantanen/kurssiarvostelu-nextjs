@@ -1,4 +1,3 @@
-/*
 "use client"
 
 type DeleteReviewProps = {
@@ -10,8 +9,9 @@ export default function DeleteReviewButton({ id, deleteReview }: DeleteReviewPro
   
   return (
     <div>
-      <button onClick={() => deleteReview(id)}>Poista</button>
+      <button
+      className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+      onClick={() => deleteReview(id)}>Poista</button>
     </div>
   )
 }
-*/
