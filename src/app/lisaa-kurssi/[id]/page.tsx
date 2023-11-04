@@ -8,7 +8,8 @@ async function getSchool(schoolId: string) {
   return prisma.school.findUnique({ where: { id: schoolId } })
 }
 
-async function addCourse(name: string, schoolId: string, courseCode: string) {
+async function addCourse(name: string, schoolId: string, courseCode: string,
+  minCredits: number, maxCredits: number, lang: string) {
   "use server"
 
   const session = await getServerSession(authOptions)
@@ -19,12 +20,15 @@ async function addCourse(name: string, schoolId: string, courseCode: string) {
 
   if (typeof name !== "string" || name.length === 0 || 
   typeof schoolId !== "string" || schoolId.length === 0 ||
-  typeof courseCode !== "string" || courseCode.length === 0) {
+  typeof courseCode !== "string" || courseCode.length === 0
+  || typeof minCredits !== 'number' || typeof maxCredits !== 'number' ||
+  typeof lang !== 'string' || lang.length === 0) {
       throw new Error("Invalid coursename")
     }
 
     // luodaan relaatio käyttäjän uniikin sähköpostin perusteella
   await prisma.course.create({ data: { name, courseCode,
+    minCredits, maxCredits, lang, 
   school: {
       connect: {
           id: schoolId

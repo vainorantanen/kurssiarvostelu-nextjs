@@ -1,8 +1,12 @@
 //import DeleteCourseButton from "@/components/DeleteCourseButton";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import DeleteReviewButton from "@/components/DeleteReviewButton";
 import prisma from "@/db";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FaStar } from 'react-icons/fa';
+import { User } from "@prisma/client";
 
 async function getCourse(courseId: string) {
   return prisma.course.findUnique({ where: { id: courseId } });
@@ -29,12 +33,47 @@ export async function deleteCourse(id: string) {
         redirect('/poistettu-onnistuneesti')
     }
   }
-
   */
+
+async function getUser(email: string) {
+  return prisma.user.findUnique({ where: { email } })
+}
+
+async function deleteReview(id: string) {
+    "use server"
+
+    const session = await getServerSession(authOptions)
+
+    const rev = await prisma.review.findUnique({ where: {id} })
+    if (!rev) {
+      throw new Error("Arvostelua ei löytynyt")
+    }
+
+    if (!session || !session.user || !session.user.email) {
+      throw new Error("Sessionia ei ole")
+    }
+
+    const userFromDb = await getUser(session.user.email)
+
+    if (!userFromDb) {
+      throw new Error("Käyttäjää ei löytynyt")
+    }
+
+    if (session.user.email !== process.env.ADMIN && userFromDb.id !== rev.userId) {
+      throw new Error("Vain admin tai arvostelun lisännyt voi poistaa arvostelun")
+    }
+
+    await prisma.review.delete({ where: { id } });
+
+    redirect('/poistettu-onnistuneesti')
+  }
+
+
   export default async function SingleCoursePage({ params }: any) {
     const course = await getCourse(params.id);
     const reviewsOfCourse = await getReviewsByCourse(params.id);
-  
+    const session = await getServerSession(authOptions)
+
     if (!course) {
       return (
         <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
@@ -45,7 +84,13 @@ export async function deleteCourse(id: string) {
         </div>
       );
     }
-  
+
+    var userFromDb: User | null = null;
+
+
+    if (session && session.user && session.user.email) {
+      userFromDb = await getUser(session.user.email)
+    }
       // Calculate the average star rating
       const totalRating = reviewsOfCourse.reduce((acc, review) => acc + review.rating, 0);
       const averageRating = totalRating / reviewsOfCourse.length;
@@ -88,6 +133,7 @@ export async function deleteCourse(id: string) {
     <Link href={`/koulut/${course.schoolId}`}>Takaisin</Link>
   </button>
   <h1 className="text-3xl font-bold my-4 text-white">{course.name}</h1>
+  <p className="mb-2">{course.courseCode} ({course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits} - ${course.maxCredits}`}op)</p>
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/lisaa-arvostelu/${course.id}`}>Arvostele tämä kurssi</Link>
   </button>
@@ -174,6 +220,10 @@ export async function deleteCourse(id: string) {
                         ))}
                       </div>
                       <p className="text-black">Saatu arvosana {review.grade}</p>
+                      {userFromDb && (userFromDb.email === process.env.ADMIN
+                      || userFromDb.id === review.userId) && (
+                        <DeleteReviewButton id={review.id} deleteReview={deleteReview}/>
+                      )}
                     </div>
                   ))
                 ) : (
