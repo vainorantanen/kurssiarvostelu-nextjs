@@ -2,16 +2,10 @@
 
 import { useState } from "react";
 import Link from 'next/link';
-import { Review } from "@prisma/client";
+import { Review, Course } from "@prisma/client";
 import { FaStar } from "react-icons/fa";
 import notebookImage from '@/Assets/book.png'
 import Image from 'next/image';
-
-
-type Course = {
-    id: string;
-    name: string;
-};
   
 type CourseSearchProps = {
     initialCourses: Course[];
@@ -22,6 +16,8 @@ type CourseSearchProps = {
 const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews, schoolId }) => {
     const [sortBy, setSortBy] = useState(""); // State for sorting
     const [searchQuery, setSearchQuery] = useState(""); // State for search
+    const [currentPage, setCurrentPage] = useState(1);
+    const coursesPerPage = 15;
 
     const filteredCourses = initialCourses.filter((course) =>
         course.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -35,6 +31,14 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
         }
         return 0;
     });
+
+    const indexOfLastCourse = currentPage * coursesPerPage;
+    const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+    const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+  
+    const paginate = (pageNumber: number) => {
+      setCurrentPage(pageNumber);
+    };
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -63,7 +67,7 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
             <div className="md:col-span-2">
                 <div className="grid grid-cols-1 gap-4">
                     {filteredCourses.length > 0 ? (
-                      sortedCourses.map((course) => {
+                      currentCourses.map((course) => {
                         const reviewsOfCourse = allReviews.filter(r => r.courseId === course.id);
                         const reviewCount = reviewsOfCourse.length;
                         const sum = reviewsOfCourse.reduce((acc, review) => acc + review.rating, 0);
@@ -90,8 +94,9 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                               <div>
                                 <Link href={`/kurssit/${course.id}`}>
                                   <p className="text-lg font-semibold text-blue-500 hover:underline">
-                                    {course.name}
+                                    {course.name}, {course.courseCode} ({course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits} - ${course.maxCredits}`}op)
                                   </p>
+                                  <p className="text-black text-sm">Kieli: {course.lang}</p>
                                   <p className="text-black">{reviewCount} {reviewCount === 1 ? 'Arvostelu' : 'Arvostelua'}</p>
                                   <div className="flex items-center text-black">
                                     <p className="mr-2">{averageRating.toFixed(1)} tähteä</p>
@@ -113,7 +118,30 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                       </div>
                     )}
                 </div>
+                <div className="md:col-span-3">
+        {filteredCourses.length > coursesPerPage ? (
+          <ul className="flex justify-center mt-4">
+            {Array(Math.ceil(filteredCourses.length / coursesPerPage))
+              .fill(null)
+              .map((_, index) => (
+                <li key={index}>
+                  <button
+                    className={`${
+                      currentPage === index + 1
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    } font-semibold py-2 px-4 my-1 mx-1 rounded-l hover:bg-blue-600 focus:outline-none`}
+                    onClick={() => paginate(index + 1)}
+                  >
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
+          </ul>
+        ) : null}
+
             </div>
+        </div>
         </div>
     );
 }

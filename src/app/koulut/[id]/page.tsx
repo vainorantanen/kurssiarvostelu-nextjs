@@ -42,7 +42,7 @@ export default async function SingleschoolPage({ params }: any) {
   if (!school) {
     return (
       <div>
-        <Link href="/koulut" className="text-blue-500 hover:underline">
+        <Link href="/" className="text-blue-500 hover:underline">
           Takaisin
         </Link>
         <h1 className="text-2xl font-bold mt-4">Yksittäinen Koulu</h1>

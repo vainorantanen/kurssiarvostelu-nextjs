@@ -88,6 +88,7 @@ export async function deleteCourse(id: string) {
     <Link href={`/koulut/${course.schoolId}`}>Takaisin</Link>
   </button>
   <h1 className="text-3xl font-bold my-4 text-white">{course.name}</h1>
+  <p className="mb-2">{course.courseCode} ({course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits} - ${course.maxCredits}`}op)</p>
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/lisaa-arvostelu/${course.id}`}>Arvostele tämä kurssi</Link>
   </button>

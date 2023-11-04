@@ -34,6 +34,11 @@ model Course {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   name String
   courseCode String
+  minCredits Int
+  maxCredits Int
+  organisations String[]
+  lang  String
+  activityPeriods Json[]
   isVisible Boolean @default(false)
   reviews Review[]
   school        School?     @relation(fields: [schoolId], references: [id])
