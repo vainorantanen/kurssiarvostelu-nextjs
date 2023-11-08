@@ -27,25 +27,6 @@ async function getReviewsByCourse(courseSisuId: string) {
   return prisma.review.findMany({ where: { courseSisuId } })
 }
 
-/*
-export async function deleteCourse(id: string) {
-    "use server"
-  
-    var success = false;
-
-    try {
-      await prisma.course.delete({ where: { id } });
-      success = true
-    } catch (error) {
-      console.error("Error deleting course:", error);
-    }
-
-    if (success) {
-        redirect('/poistettu-onnistuneesti')
-    }
-  }
-  */
-
 async function getUser(email: string) {
   return prisma.user.findUnique({ where: { email } })
 }
@@ -139,9 +120,9 @@ async function deleteReview(id: string) {
         return (
           <div className="min-h-screen flex flex-col md:flex-row">
             {/* Summary and Chart on small screens (1/3 width) */}
-            <div className="w-full md:w-1/3 p-4">
+            <div className="w-full md:w-2/5 p-4">
             <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-    <Link href={`/koulut`}>Takaisin</Link>
+    <Link href={`/koulut/${course.universityOrgIds[0]}`}>Takaisin</Link>
   </button>
   <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi}</h1>
   <p className="mb-2">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
@@ -214,8 +195,8 @@ async function deleteReview(id: string) {
             </div>
         
             {/* Reviews on small screens (2/3 width) */}
-            <div className="w-full md:w-2/3 p-4">
-              <h2 className="text-2xl font-bold text-white mt-4 mb-2">Arvostelut</h2>
+            <div className="w-full md:w-3/5 p-4">
+              <h2 className="text-2xl font-bold text-white mt-5 mb-2 text-center">Arvostelut</h2>
               <div className="grid grid-cols-1 gap-4">
                 {/* Reviews */}
                 { reviewsOfCourse.length > 0 ? (
@@ -238,7 +219,7 @@ async function deleteReview(id: string) {
                     </div>
                   ))
                 ) : (
-                  <p className="text-white mb-2">Ei vielä arvosteluja</p>
+                  <p className="text-white mb-2 text-center">Ei vielä arvosteluja</p>
                 ) }
               </div>
             </div>

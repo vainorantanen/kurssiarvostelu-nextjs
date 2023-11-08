@@ -12,14 +12,21 @@ import geometryPic from '@/Assets/geometry.png'
 import anonymPic from '@/Assets/anonym.png'
 import { redirect } from 'next/navigation';
 
-type School = {
-  id: string;
-  name: string;
-};
-
-
+/*
 function getSchools() {
   return prisma.school.findMany()
+}
+*/
+
+async function getSchools() {
+  "use server"
+
+  const res = await fetch("https://sis-tuni.funidata.fi/kori/api/organisations")
+  const data = await res.json() as School[]
+  
+  const schools = data.filter(d => d.parentId == null)
+  return schools
+  
 }
 
 export default async function Home() {
@@ -33,16 +40,8 @@ export default async function Home() {
   return (
     <div className="flex flex-col items-center space-y-4">
       <h1 className="text-4xl my-4 font-bold">Femmat.fi</h1>
-      {session && session.user?.email === process.env.ADMIN && (
-        <Link
-          href="/lisaa-koulu"
-          className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
-        >
-          Lisää koulu
-        </Link>
-      )}
       <div className="h-64">
-        <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.localeCompare(b.name))}/>
+        <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.fi.localeCompare(b.name.fi))}/>
         </div>
         <div className="flex items-center flex-wrap gap-4 justify-center">
         <div className="relative w-60 h-60">
@@ -96,12 +95,12 @@ export default async function Home() {
         <div className="relative h-40 w-full">
           <Image
             src={schoolImage} // Kuvan lähde
-            alt={school.name}
+            alt={school.name.fi}
             layout="fill"
             objectFit="cover"
           />
         </div>
-        <p className="text-xl text-black font-semibold mt-2 hover:underline">{school.name}</p>
+        <p className="text-xl text-black font-semibold mt-2 hover:underline">{school.name.fi}</p>
       </Link>
     </div>
   ))}

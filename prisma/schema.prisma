@@ -33,11 +33,6 @@ model User {
   reviews Review[]
 }
 
-model School {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-}
-
 model CourseRequest {
     id       String    @id @default(auto()) @map("_id") @db.ObjectId
     name String

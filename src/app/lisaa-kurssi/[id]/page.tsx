@@ -5,7 +5,13 @@ import AddCourseForm from "@/components/AddCourseForm"
 import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 
 async function getSchool(schoolId: string) {
-  return prisma.school.findUnique({ where: { id: schoolId } })
+  "use server"
+
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/${schoolId}`)
+  const data = await res.json() as School
+  
+  return data
+  
 }
 
 async function addCourse(name: string, schoolName: string, code: string,
@@ -45,7 +51,7 @@ if (!school) {
 return (
   <div className="flex flex-col items-center space-y-4 min-h-screen">
     <div>
-      <AddCourseForm id={school.id} schoolName={school.name} addCourse={addCourse}/>
+      <AddCourseForm id={school.id} schoolName={school.name.fi} addCourse={addCourse}/>
     </div>
   </div>
 );

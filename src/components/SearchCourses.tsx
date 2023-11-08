@@ -11,30 +11,41 @@ type CourseSearchProps = {
     //initialCourses: Course[]
     allReviews: Review[];
     schoolId: string,
-    getSearchCourses: (orgId: string) => Promise<Course[]>
+    getKoulutusOhjelmat: (schoolId: string) => Promise<Koulutusohjelma[]>
+    getSearchCourses: (orgId: string, schoolId: string) => Promise<Course[]>
 };
 
-const koulutusohjelmat = {
-  "Tuotantotalous": "tuni-org-1301000013",
-  "Tietojohtaminen": "tuni-org-1301000012",
-  "Kauppatieteet": "tuni-org-1301000010"
-}
-
-const SearchCourses: React.FC<CourseSearchProps> = ({ getSearchCourses, allReviews, schoolId }) => {
+const SearchCourses: React.FC<CourseSearchProps> = ({ getSearchCourses, allReviews,
+  getKoulutusOhjelmat, schoolId }) => {
     const [sortBy, setSortBy] = useState(""); // State for sorting
     const [searchQuery, setSearchQuery] = useState(""); // State for search
     const [currentPage, setCurrentPage] = useState(1);
     const coursesPerPage = 20;
     const [courses, setCourses] = useState<Course[]>([]);
-    const [ orgId, setOrgId ] = useState('tuni-org-1301000013')
+    const [ koulutusOhjelmat, setKoulutusOhjelmat ] = useState<Koulutusohjelma[]>([])
+    const [ orgId, setOrgId ] = useState('')
   //tuni-org-1301000013
     const filteredCourses = courses.filter((course) =>
     course.name.toLowerCase().includes(searchQuery.toLowerCase())
 );
 
+useEffect(() => {
+  const fetchKoulutusOhjelmat = async () => { // Define the fetchKoulutusOhjelmat function
+      try {
+          const res = await getKoulutusOhjelmat(schoolId);
+          setKoulutusOhjelmat(res);
+          setOrgId(res[0].id)
+      } catch (error) {
+          console.error("Error fetching courses:", error);
+      }
+  };
+
+  fetchKoulutusOhjelmat(); // Call the fetchKoulutusOhjelmat function
+}, []);
+
 const handlePress = async (orgId: string) => {
   try {
-    const result = await getSearchCourses(orgId);
+    const result = await getSearchCourses(orgId, schoolId);
     setCourses(result); // Set the courses data
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -66,18 +77,19 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
                 <h2 className="text-lg font-semibold mb-2">Suodata</h2>
                     
                     <select
-                    className="p-2 border border-gray-300 rounded text-black"
+                    className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
                     value={orgId}
                     onChange={(e) => setOrgId(e.target.value)}
                   >
-                    {Object.entries(koulutusohjelmat).map(([ohjelma, value]) => (
-                      <option key={value} value={value}>
-                        {ohjelma}
+                    {koulutusOhjelmat.map(ohjelma => (
+                      <option key={ohjelma.id} value={ohjelma.id} >
+                        {ohjelma.name.fi}
                       </option>
                     ))}
                   </select>
+                  <br></br>
                   <button
-                  className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
+                  className="my-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
                   onClick={() => handlePress(orgId)}>Hae kurssit</button>
                     <h2 className="text-lg font-semibold mb-2">Lajittele</h2>
                     <select
@@ -147,16 +159,13 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
                     })
                     ) : (
                       <div className="text-center">
-                      <p className="text-2xl mb-2">Ei löytyny kursseja :(</p>
-                      <Link
-                        className="bg-blue-500 text-white font-semibold py-1 px-1 rounded hover:bg-blue-600"
-                        href={`/lisaa-kurssi/${schoolId}`}>Lisää</Link> sä eka!
+                      <p className="text-2xl mb-2">Lisää rajaustekijöitä etsiäksesi kursseja</p>
                       </div>
                     )}
                 </div>
                 <div className="md:col-span-3">
         {filteredCourses.length > coursesPerPage ? (
-          <ul className="flex justify-center mt-4">
+          <ul className="flex flex-wrap justify-center mt-4">
             {Array(Math.ceil(filteredCourses.length / coursesPerPage))
               .fill(null)
               .map((_, index) => (
@@ -177,6 +186,7 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
         ) : null}
 
             </div>
+
         </div>
         </div>
     );
