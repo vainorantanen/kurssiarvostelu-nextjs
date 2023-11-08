@@ -30,8 +30,11 @@ export async function POST(req: any) {
     var mailOptions = {
       from: process.env.SENDING_EMAIL,
       to: email,
-      subject: 'Sähköpostin vahvistus linkki',
-      text: confirmLink
+      subject: 'Sähköpostin vahvistus Femma.app',
+      html: `
+      <p>Kiitos rekisteröitymisestä Femmaan! Vahvistathan sähköpostisi alla olevasta napista:</p>
+ <a href="${confirmLink}" style="background-color: #286ceb; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Vahvista sähköposti</a>
+      `
     }
 
     // eslint-disable-next-line no-unused-vars

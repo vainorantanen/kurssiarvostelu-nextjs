@@ -9,14 +9,20 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
 
   const router = useRouter();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    if (!name || !email || !password) {
-      setError("All fields are necessary.");
+    if (!name || !email || !password || !verifyPassword) {
+      setError("Kaikki kentät ovat pakollisia.");
+      return;
+    }
+  
+    if (password !== verifyPassword) {
+      setError("Salasana ja vahvistus eivät täsmää.");
       return;
     }
 
@@ -99,6 +105,12 @@ export default function RegisterForm() {
             placeholder="Salasana"
             className="bg-white text-black rounded-lg px-3 py-2"
           />
+          <input
+          onChange={(e) => setVerifyPassword(e.target.value)}
+          type="password"
+          placeholder="Vahvista salasana"
+          className="bg-white text-black rounded-lg px-3 py-2"
+        />
           <button className="bg-blue-600 text-white font-bold cursor-pointer px-6 py-2">
             Rekisteröidy
           </button>
