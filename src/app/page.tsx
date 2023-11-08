@@ -39,7 +39,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1 className="text-4xl my-4 font-bold">Femmat.fi</h1>
+      <h1 className="text-4xl my-4 font-bold">Femma</h1>
       <div className="h-64">
         <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.fi.localeCompare(b.name.fi))}/>
         </div>
@@ -51,7 +51,7 @@ export default async function Home() {
         />
          </div>
           <div className="max-w-lg">
-              <h1 className='text-2xl mb-3'>Etsi haluamasi kurssi koulusi kurssitarjonnasta</h1>
+              <h1 className='text-2xl font-bold mb-3'>Etsi haluamasi kurssi koulusi kurssitarjonnasta</h1>
               <p>Voit hakea kursseja koulujen perusteella suoraan hakusanoilla tai suodattamalla hakutuloksia
                  haluamallasi tavalla.
               </p>
@@ -60,7 +60,7 @@ export default async function Home() {
         <br></br>
         <div className="flex items-center flex-wrap-reverse gap-4 justify-center">
           <div className="max-w-lg">
-              <h1 className='text-2xl mb-3'>Lue kurssin arvosteluja ja lisää omasi</h1>
+              <h1 className='text-2xl font-bold mb-3'>Lue kurssin arvosteluja ja lisää omasi</h1>
               <p>Tutustumalla kurssin saamiin arvosteluihin muilta opiskelijoilta ja alumneilta, 
                 pystyt valitsemaan opintoihisi sopivimmat kurssit.
               </p>
@@ -81,7 +81,7 @@ export default async function Home() {
         />
          </div>
           <div className="max-w-lg">
-              <h1 className='text-2xl mb-3'>Anonyymit arvostelut</h1>
+              <h1 className='text-2xl font-bold mb-3'>Anonyymit arvostelut</h1>
               <p>Arvostelut ovat täysin anonyymejä eli arvostelijan tiedot eivät ole muiden näkyvillä. 
                 Voit siis huoletta antaa kurssien risut ja ruusut! 
               </p>

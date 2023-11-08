@@ -18,7 +18,7 @@ export default function Navbar() {
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <button className="text-white text-2xl font-bold hover:underline">
-            <Link href="/">Femmat.fi</Link>
+            <Link href="/">Femma</Link>
           </button>
         </div>
         <div className="hidden md:flex space-x-4">

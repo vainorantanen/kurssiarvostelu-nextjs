@@ -6,7 +6,6 @@ const bcrypt = require('bcrypt')
 export async function POST(req: any) {
   try {
     const { name, email, password } = await req.json();
-    console.log('credentials', name, email, password)
     const hashedPassword = await bcrypt.hash(password, 10);
     // Use Prisma's `user.create` method correctly with the appropriate data structure
     await prisma.user.create({
