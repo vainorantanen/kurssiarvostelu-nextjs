@@ -51,7 +51,22 @@ export default function RegisterForm() {
       if (res.ok) {
         const form = e.target;
         form.reset();
-        router.push("/");
+
+        const sendMailRes = await fetch('/api/sendMail', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+          }),
+        })
+
+        if (sendMailRes.ok) {
+          router.push("/kiitos-rekisteroitymisesta");
+        } else {
+          console.log("Sending email failed.");
+        }
       } else {
         console.log("User registration failed.");
       }

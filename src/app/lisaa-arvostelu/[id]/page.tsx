@@ -6,6 +6,11 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import AddReviewForm from "@/components/AddReviewForm";
 
+const emailEndings = [
+  "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
+  "arcada.fi"
+]
+
 async function getCourse(courseId: string) {
   "use server"
 
@@ -25,6 +30,12 @@ async function addReview(description: string,
     throw new Error("Sinun tulee kirjautua sisään lisätäksesi arvostelu")
   }
 
+  const userFromDb = await prisma.user.findUnique({ where: { email: session.user.email } })
+
+  if (!userFromDb) {
+    throw new Error("Tapahtui virhe! Käyttäjää ei löytynyt tietokannasta")
+  }
+
   if (typeof description !== "string" || description.length === 0
   || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number'
   || !year || typeof year !== 'string' || !workload || typeof workload !== 'number'
@@ -42,6 +53,7 @@ async function addReview(description: string,
     year,
     workload,
     courseSisuId,
+    writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
   user: {
     connect: {
       email: session.user.email

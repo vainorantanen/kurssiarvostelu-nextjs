@@ -5,7 +5,7 @@ import prisma from "@/db";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaCheckCircle } from 'react-icons/fa';
 import { User } from "@prisma/client";
 
 /*
@@ -202,7 +202,12 @@ async function deleteReview(id: string) {
                 { reviewsOfCourse.length > 0 ? (
                   reviewsOfCourse.map((review) => (
                     <div key={review.id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg">
-    
+                        {review.writerIsVerified && (
+                        <div className="mb-2 flex items-center">
+                          <FaCheckCircle className="text-blue-500 mr-2" />
+                          <p className="text-black">Verifioitu opiskelija</p>
+                        </div>
+                      )}
                         <p className="text-black mb-2 whitespace-break-spaces">{review.description}</p>
     
                       <div className="flex items-center text-black">
