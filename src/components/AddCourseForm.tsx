@@ -7,31 +7,25 @@ type AddCourseProps = {
   schoolName: string;
   addCourse: (
     name: string,
-    schoolId: string,
-    courseCode: string,
-    minCredits: number,
-    maxCredits: number,
-    lang: string
+    schoolName: string,
+    code: string,
+    credits: string
   ) => void;
 };
 
-export default function AddCourseForm({ id, schoolName, addCourse }: AddCourseProps) {
+export default function AddCourseForm({ schoolName, addCourse }: AddCourseProps) {
   const [name, setName] = useState(""); // Corrected the variable name
   const [courseCode, setCourseCode] = useState("");
-  const [minCredits, setMinCredits] = useState(0);
-  const [maxCredits, setMaxCredits] = useState(0);
-  const [lang, setLang] = useState("");
+  const [credits, setCredits] = useState("");
 
   const handleaddCourse = () => {
     // Check if name is not empty before adding the review
     if (name.trim() !== "") {
-      addCourse(name, id, courseCode, minCredits, maxCredits, lang);
+      addCourse(name, schoolName, courseCode, credits);
       // Clear the form fields after adding the course
       setName("");
       setCourseCode("");
-      setMinCredits(0);
-      setMaxCredits(0);
-      setLang("");
+      setCredits("")
     }
   };
 
@@ -56,29 +50,14 @@ export default function AddCourseForm({ id, schoolName, addCourse }: AddCoursePr
           value={courseCode}
           onChange={(e) => setCourseCode(e.target.value)}
         />
+        <p>Kurssin laajuus (op)</p>
         <input
           type="text"
           name="lang"
           className="w-64 px-3 py-2 border rounded focus:outline-none text-black"
           placeholder="kieli (esim. fi)"
-          value={lang}
-          onChange={(e) => setLang(e.target.value)}
-        />
-        <p>Minimi opintopisteet</p>
-        <input
-          type="number"
-          className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
-          placeholder="Minimi opintopisteet"
-          value={minCredits}
-          onChange={(e) => setMinCredits(parseInt(e.target.value, 10))}
-        />
-        <p>Maksimi opintopisteet</p>
-        <input
-          type="number"
-          className="px-3 py-2 border rounded w-64 shadow focus:outline-none text-black"
-          placeholder="Maksimi opintopisteet"
-          value={maxCredits}
-          onChange={(e) => setMaxCredits(parseInt(e.target.value, 10))}
+          value={credits}
+          onChange={(e) => setCredits(e.target.value)}
         />
         <button
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"

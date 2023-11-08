@@ -1,40 +1,69 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from 'next/link';
-import { Review, Course } from "@prisma/client";
+import { Review } from "@prisma/client";
 import { FaStar } from "react-icons/fa";
 import notebookImage from '@/Assets/book.png'
 import Image from 'next/image';
-  
+
 type CourseSearchProps = {
-    initialCourses: Course[];
+    //initialCourses: Course[]
     allReviews: Review[];
-    schoolId: string
+    schoolId: string,
+    getKoulutusOhjelmat: (schoolId: string) => Promise<Koulutusohjelma[]>
+    getSearchCourses: (orgId: string, schoolId: string) => Promise<Course[]>
 };
 
-const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews, schoolId }) => {
+const SearchCourses: React.FC<CourseSearchProps> = ({ getSearchCourses, allReviews,
+  getKoulutusOhjelmat, schoolId }) => {
     const [sortBy, setSortBy] = useState(""); // State for sorting
     const [searchQuery, setSearchQuery] = useState(""); // State for search
     const [currentPage, setCurrentPage] = useState(1);
-    const coursesPerPage = 15;
+    const coursesPerPage = 20;
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [ koulutusOhjelmat, setKoulutusOhjelmat ] = useState<Koulutusohjelma[]>([])
+    const [ orgId, setOrgId ] = useState('')
+  //tuni-org-1301000013
+    const filteredCourses = courses.filter((course) =>
+    course.name.toLowerCase().includes(searchQuery.toLowerCase())
+);
 
-    const filteredCourses = initialCourses.filter((course) =>
-        course.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+useEffect(() => {
+  const fetchKoulutusOhjelmat = async () => { // Define the fetchKoulutusOhjelmat function
+      try {
+          const res = await getKoulutusOhjelmat(schoolId);
+          setKoulutusOhjelmat(res);
+          setOrgId(res[0].id)
+      } catch (error) {
+          console.error("Error fetching courses:", error);
+      }
+  };
 
-    const sortedCourses = [...filteredCourses].sort((a, b) => {
-        if (sortBy === "name-asc") {
-            return a.name.localeCompare(b.name);
-        } else if (sortBy === "name-desc") {
-            return b.name.localeCompare(a.name);
-        }
-        return 0;
-    });
+  fetchKoulutusOhjelmat(); // Call the fetchKoulutusOhjelmat function
+}, []);
 
-    const indexOfLastCourse = currentPage * coursesPerPage;
-    const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
-    const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+const handlePress = async (orgId: string) => {
+  try {
+    const result = await getSearchCourses(orgId, schoolId);
+    setCourses(result); // Set the courses data
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+  }
+}
+
+const sortedCourses = [...filteredCourses].sort((a, b) => {
+    if (sortBy === "name-asc") {
+        return a.name.localeCompare(b.name);
+    } else if (sortBy === "name-desc") {
+        return b.name.localeCompare(a.name);
+    }
+    return 0;
+});
+
+const indexOfLastCourse = currentPage * coursesPerPage;
+const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse);
   
     const paginate = (pageNumber: number) => {
       setCurrentPage(pageNumber);
@@ -45,6 +74,23 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
             <div className="md:col-span-1">
                 {/* Sidebar */}
                 <div className="p-4">
+                <h2 className="text-lg font-semibold mb-2">Suodata</h2>
+                    
+                    <select
+                    className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
+                    value={orgId}
+                    onChange={(e) => setOrgId(e.target.value)}
+                  >
+                    {koulutusOhjelmat.map(ohjelma => (
+                      <option key={ohjelma.id} value={ohjelma.id} >
+                        {ohjelma.name.fi}
+                      </option>
+                    ))}
+                  </select>
+                  <br></br>
+                  <button
+                  className="my-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
+                  onClick={() => handlePress(orgId)}>Hae kurssit</button>
                     <h2 className="text-lg font-semibold mb-2">Lajittele</h2>
                     <select
                         className="p-2 border border-gray-300 rounded text-black"
@@ -55,20 +101,22 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                         <option value="name-asc">Nimi (A-Z)</option>
                         <option value="name-desc">Nimi (Z-A)</option>
                     </select>
-                    <input
-                        type="text"
-                        className="p-2 border text-black border-gray-300 rounded w-full mt-4"
-                        placeholder="Hae kurssia..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                    {currentPage == 1 && (
+                      <input
+                      type="text"
+                      className="p-2 border text-black border-gray-300 rounded w-full mt-4"
+                      placeholder="Hae kurssia..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                    )}
                 </div>
             </div>
             <div className="md:col-span-2">
                 <div className="grid grid-cols-1 gap-4">
                     {filteredCourses.length > 0 ? (
                       currentCourses.map((course) => {
-                        const reviewsOfCourse = allReviews.filter(r => r.courseId === course.id);
+                        const reviewsOfCourse = allReviews.filter(r => r.courseSisuId === course.id);
                         const reviewCount = reviewsOfCourse.length;
                         const sum = reviewsOfCourse.reduce((acc, review) => acc + review.rating, 0);
                         const averageRating = reviewCount > 0 ? sum / reviewCount : 0;
@@ -94,7 +142,7 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                               <div>
                                 <Link href={`/kurssit/${course.id}`}>
                                   <p className="text-lg font-semibold text-blue-500 hover:underline">
-                                    {course.name}, {course.courseCode} ({course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits} - ${course.maxCredits}`}op)
+                                    {course.name}, {course.code} ({course.credits.min === course.credits.max ? course.credits.min : `${course.credits.min} - ${course.credits.max}`}op)
                                   </p>
                                   <p className="text-black text-sm">Kieli: {course.lang}</p>
                                   <p className="text-black">{reviewCount} {reviewCount === 1 ? 'Arvostelu' : 'Arvostelua'}</p>
@@ -111,16 +159,13 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
                     })
                     ) : (
                       <div className="text-center">
-                      <p className="text-2xl mb-2">Ei löytyny kursseja :(</p>
-                      <Link
-                        className="bg-blue-500 text-white font-semibold py-1 px-1 rounded hover:bg-blue-600"
-                        href={`/lisaa-kurssi/${schoolId}`}>Lisää</Link> sä eka!
+                      <p className="text-2xl mb-2">Lisää rajaustekijöitä etsiäksesi kursseja</p>
                       </div>
                     )}
                 </div>
                 <div className="md:col-span-3">
         {filteredCourses.length > coursesPerPage ? (
-          <ul className="flex justify-center mt-4">
+          <ul className="flex flex-wrap justify-center mt-4">
             {Array(Math.ceil(filteredCourses.length / coursesPerPage))
               .fill(null)
               .map((_, index) => (
@@ -141,6 +186,7 @@ const SearchCourses: React.FC<CourseSearchProps> = ({ initialCourses, allReviews
         ) : null}
 
             </div>
+
         </div>
         </div>
     );

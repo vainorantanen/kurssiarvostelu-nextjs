@@ -5,11 +5,17 @@ import AddCourseForm from "@/components/AddCourseForm"
 import { authOptions } from "@/app/api/auth/[...nextauth]/options"
 
 async function getSchool(schoolId: string) {
-  return prisma.school.findUnique({ where: { id: schoolId } })
+  "use server"
+
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/${schoolId}`)
+  const data = await res.json() as School
+  
+  return data
+  
 }
 
-async function addCourse(name: string, schoolId: string, courseCode: string,
-  minCredits: number, maxCredits: number, lang: string) {
+async function addCourse(name: string, schoolName: string, code: string,
+ credits: string ) {
   "use server"
 
   const session = await getServerSession(authOptions)
@@ -18,22 +24,19 @@ async function addCourse(name: string, schoolId: string, courseCode: string,
     throw new Error("Sinun tulee kirjautua sisään lisätäksesi arvostelu")
   }
 
-  if (typeof name !== "string" || name.length === 0 || 
-  typeof schoolId !== "string" || schoolId.length === 0 ||
-  typeof courseCode !== "string" || courseCode.length === 0
-  || typeof minCredits !== 'number' || typeof maxCredits !== 'number' ||
-  typeof lang !== 'string' || lang.length === 0) {
-      throw new Error("Invalid coursename")
-    }
+  if (
+    typeof name !== "string" ||
+    name.length === 0 ||
+    typeof code !== "string" ||
+    code.length === 0 ||
+    typeof schoolName !== 'string' || schoolName.length === 0
+    || typeof credits !== 'string' || credits.length === 0
+  ) {
+    throw new Error("Invalid course information");
+  }
 
     // luodaan relaatio käyttäjän uniikin sähköpostin perusteella
-  await prisma.course.create({ data: { name, courseCode,
-    minCredits, maxCredits, lang, 
-  school: {
-      connect: {
-          id: schoolId
-      }
-  } } })
+  await prisma.courseRequest.create({ data: { name, code, schoolName, credits} })
   redirect('/kiitos-kurssin-lisaamisesta')
 }
 
@@ -48,7 +51,7 @@ if (!school) {
 return (
   <div className="flex flex-col items-center space-y-4 min-h-screen">
     <div>
-      <AddCourseForm id={school.id} schoolName={school.name} addCourse={addCourse}/>
+      <AddCourseForm id={school.id} schoolName={school.name.fi} addCourse={addCourse}/>
     </div>
   </div>
 );

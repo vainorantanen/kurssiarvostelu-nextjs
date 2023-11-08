@@ -3,11 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
-type School = {
-  id: string;
-  name: string;
-};
-
 type FrontPageSearchProps = {
   initialSchools: School[];
 };
@@ -23,7 +18,7 @@ const FrontPageSearch: React.FC<FrontPageSearchProps> = ({ initialSchools }) => 
     setSearchTerm(value);
 
     const filteredSchools = initialSchools.filter((school) =>
-      school.name.toLowerCase().includes(value)
+      school.name.fi.toLowerCase().includes(value)
     );
 
     setSchools(filteredSchools);
@@ -47,7 +42,7 @@ const FrontPageSearch: React.FC<FrontPageSearchProps> = ({ initialSchools }) => 
             {schools.map((school, index) => (
               <li key={school.id} className="my-2">
                 <Link href={`/koulut/${school.id}`} className="hover:text-blue-500">
-                  {school.name}
+                  {school.name.fi}
                 </Link>
               </li>
             ))}

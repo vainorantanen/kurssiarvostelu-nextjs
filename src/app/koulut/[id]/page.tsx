@@ -3,41 +3,43 @@ import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+// school = organisation
+
 async function getSchool(schoolId: string) {
-  return prisma.school.findUnique({ where: { id: schoolId } });
+  "use server"
+
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/${schoolId}`)
+  const data = await res.json() as School
+  
+  return data
+  
 }
 
-async function getVisibleCoursesBySchool(schoolId: string) {
-  return prisma.course.findMany({where: { schoolId, isVisible: true }}) 
+async function getKoulutusOhjelmat(schoolId: string) {
+  "use server"
+
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/`)
+  const data = await res.json() as Koulutusohjelma[]
+  
+  const koulutusOhjelmat = data.filter(d => d.universityOrgId === schoolId && d.parentId !== null)
+  return koulutusOhjelmat
 }
 
 async function getAllReviews() {
   return prisma.review.findMany()
 }
-/*
-export async function deleteschool(id: string) {
-    "use server"
-  
-    var success = false;
 
-    try {
-      await prisma.school.delete({ where: { id } });
-      success = true
-    } catch (error) {
-      console.error("Error deleting school:", error);
-    }
+const getSearchCourses = async (orgId: string, universityOrgId: string) => {
+  "use server"
 
-    if (success) {
-        redirect('/poistettu-onnistuneesti')
-    }
-  }
-*/
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?limit=1000&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
+  const resultData = await res.json()
+  return resultData.searchResults as Course[]
+}
 
 export default async function SingleschoolPage({ params }: any) {
   const school = await getSchool(params.id);
   const allReviews = await getAllReviews()
-
-  const visibleCoursesOfSchool = await getVisibleCoursesBySchool(params.id);
 
   if (!school) {
     return (
@@ -53,7 +55,7 @@ export default async function SingleschoolPage({ params }: any) {
 
   return (
     <div className="min-h-screen">
-      <h1 className="text-2xl mt-4 mb-4 text-center font-bold">{school.name} Kurssit</h1>
+      <h1 className="text-2xl mt-4 mb-4 text-center font-bold">{school.name.fi} Kurssit</h1>
       <div className="mt-2 mb-3">
       <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href='/'>Takaisin</Link>
@@ -63,8 +65,10 @@ export default async function SingleschoolPage({ params }: any) {
     <Link href={`/lisaa-kurssi/${school.id}`}>Lisää kurssi</Link>
   </button>
   </div>
-      <SearchCourses initialCourses={visibleCoursesOfSchool} allReviews={allReviews}
-      schoolId={school.id}/>
+      <SearchCourses allReviews={allReviews}
+      schoolId={school.id} getSearchCourses={getSearchCourses}
+      getKoulutusOhjelmat={getKoulutusOhjelmat}
+      />
     </div>
   );
 }
