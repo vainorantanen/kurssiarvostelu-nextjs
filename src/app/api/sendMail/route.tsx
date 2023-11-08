@@ -36,7 +36,7 @@ export async function POST(req: any) {
 
     // eslint-disable-next-line no-unused-vars
     try {
-        transporter.sendMail(mailOptions)
+        await transporter.sendMail(mailOptions)
         return NextResponse.json({ message: "Sähköposti lähtetty" }, { status: 201 });
     } catch (error) {
         return NextResponse.json(

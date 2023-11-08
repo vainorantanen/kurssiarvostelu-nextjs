@@ -21,7 +21,9 @@ async function getKoulutusOhjelmat(schoolId: string) {
   const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/`)
   const data = await res.json() as Koulutusohjelma[]
   
-  const koulutusOhjelmat = data.filter(d => d.universityOrgId === schoolId && d.parentId !== null)
+  const koulutusOhjelmat = data
+  .filter(d => d.universityOrgId === schoolId && d.parentId !== null && d.parentId !== schoolId)
+  .sort((a, b) => a.name.fi.localeCompare(b.name.fi));
   return koulutusOhjelmat
 }
 
