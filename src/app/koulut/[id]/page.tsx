@@ -7,10 +7,6 @@ async function getSchool(schoolId: string) {
   return prisma.school.findUnique({ where: { id: schoolId } });
 }
 
-async function getVisibleCoursesBySchool(schoolId: string) {
-  return prisma.course.findMany({where: { schoolId, isVisible: true }}) 
-}
-
 async function getAllReviews() {
   return prisma.review.findMany()
 }
@@ -33,11 +29,20 @@ export async function deleteschool(id: string) {
   }
 */
 
+const getSearchCourses = async (orgId: string) => {
+  "use server"
+
+  //tuni-org-1301000013
+
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?limit=1000&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=tuni-university-root-id&validity=ONGOING_AND_FUTURE`)
+  const resultData = await res.json()
+  return resultData.searchResults as Course[]
+}
+
 export default async function SingleschoolPage({ params }: any) {
   const school = await getSchool(params.id);
   const allReviews = await getAllReviews()
-
-  const visibleCoursesOfSchool = await getVisibleCoursesBySchool(params.id);
+  //var visibleCoursesOfSchool = await getSearchCourses('tuni-org-1301000013')
 
   if (!school) {
     return (
@@ -63,8 +68,8 @@ export default async function SingleschoolPage({ params }: any) {
     <Link href={`/lisaa-kurssi/${school.id}`}>Lisää kurssi</Link>
   </button>
   </div>
-      <SearchCourses initialCourses={visibleCoursesOfSchool} allReviews={allReviews}
-      schoolId={school.id}/>
+      <SearchCourses allReviews={allReviews}
+      schoolId={school.id} getSearchCourses={getSearchCourses}/>
     </div>
   );
 }

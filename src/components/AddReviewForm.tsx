@@ -6,10 +6,11 @@ type AddReviewProps = {
   id: string;
   addReview: (
     description: string,
-    courseId: string,
     rating: number,
     grade: number,
-    year: string
+    year: string,
+    workload: number,
+    courseSisuId: string
   ) => void;
 };
 
@@ -18,6 +19,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
   const [rating, setRating] = useState(0);
   const [grade, setGrade] = useState(5); // Initialize grade as an empty string
   const [year, setYear] = useState("1. vuonna"); // Initial year value
+  const [ workload, setWorkload ] = useState(1)
 
   const handleAddReview = () => {
     // Check if grade is a number and between 1 and 5
@@ -28,7 +30,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
       grade >= 1 &&
       grade <= 5
     ) {
-      addReview(description, id, rating, Number(grade), year);
+      addReview(description, rating, Number(grade), year, workload, id );
       setDescription("");
       setRating(0);
       setGrade(5); // Reset grade to an empty string
@@ -65,6 +67,20 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
             </span>
           ))}
         </div>
+      </div>
+
+      <div className="my-4">
+        <p className="text-black">Arvioi kursisn työmäärää (1 = vähän, 5 = liikaa)</p>
+        <input
+          type="number"
+          id="workload"
+          name="workload"
+          min="1"
+          max="5"
+          value={workload}
+          onChange={(e) => setWorkload(Number(e.target.value))}
+          className="w-16 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
+        />
       </div>
 
       <div className="my-4">

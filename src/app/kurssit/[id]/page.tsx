@@ -8,12 +8,23 @@ import { redirect } from "next/navigation";
 import { FaStar } from 'react-icons/fa';
 import { User } from "@prisma/client";
 
+/*
 async function getCourse(courseId: string) {
   return prisma.course.findUnique({ where: { id: courseId } });
 }
+*/
 
-async function getReviewsByCourse(courseId: string) {
-  return prisma.review.findMany({ where: { courseId } })
+async function getCourse(courseId: string) {
+  "use server"
+
+  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-units/v1/${courseId}`)
+  const resultData = await res.json()
+  return resultData as SingleCourse
+}
+
+
+async function getReviewsByCourse(courseSisuId: string) {
+  return prisma.review.findMany({ where: { courseSisuId } })
 }
 
 /*
@@ -130,10 +141,10 @@ async function deleteReview(id: string) {
             {/* Summary and Chart on small screens (1/3 width) */}
             <div className="w-full md:w-1/3 p-4">
             <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-    <Link href={`/koulut/${course.schoolId}`}>Takaisin</Link>
+    <Link href={`/koulut`}>Takaisin</Link>
   </button>
-  <h1 className="text-3xl font-bold my-4 text-white">{course.name}</h1>
-  <p className="mb-2">{course.courseCode} ({course.minCredits === course.maxCredits ? course.minCredits : `${course.minCredits} - ${course.maxCredits}`}op)</p>
+  <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi}</h1>
+  <p className="mb-2">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/lisaa-arvostelu/${course.id}`}>Arvostele tämä kurssi</Link>
   </button>

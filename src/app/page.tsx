@@ -17,30 +17,6 @@ type School = {
   name: string;
 };
 
-function getVisibleCourses() {
-  return prisma.course.findMany( { where: {
-    isVisible: true
-  } } )
-}
-
-function getNonVisibleCourses() {
-  //console.log(prisma.course.findMany({}))
-  return prisma.course.findMany( { where: {
-    isVisible: false
-  } } )
-}
-
-async function makeCourseVisible(courseId: string) {
-  "use server"
-  
-  await prisma.course.update({
-    where: { id: courseId },
-    data: { isVisible: true }
-  });
-
-  redirect('/kiitos-kurssin-lisaamisesta')
-}
-
 
 function getSchools() {
   return prisma.school.findMany()
@@ -51,9 +27,6 @@ export default async function Home() {
   const session = await getServerSession(authOptions)
 
   console.log("session at Home", session)
-
-  const visibleCourses = await getVisibleCourses()
-  const nonVisibleCourses = await getNonVisibleCourses()
 
   const schools: School[] = await getSchools()
 
@@ -133,7 +106,13 @@ export default async function Home() {
     </div>
   ))}
 </div>
-      {session && session.user?.email === process.env.ADMIN && (
+    </div>
+  );
+}
+
+/*
+
+{session && session.user?.email === process.env.ADMIN && (
         <div>
           <h1 className="text-2xl font-bold">Hyväksymättömät kurssit</h1>
           <ul className="pl-4">
@@ -149,7 +128,5 @@ export default async function Home() {
           </ul>
         </div>
       )}
-    </div>
-  );
-}
+*/
 
