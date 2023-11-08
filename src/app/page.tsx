@@ -11,6 +11,7 @@ import booksPic from '@/Assets/books.png'
 import geometryPic from '@/Assets/geometry.png'
 import anonymPic from '@/Assets/anonym.png'
 import { redirect } from 'next/navigation';
+import { FaStar, FaCheckCircle } from 'react-icons/fa';
 
 /*
 function getSchools() {
@@ -86,6 +87,20 @@ export default async function Home() {
                 Voit siis huoletta antaa kurssien risut ja ruusut! 
               </p>
           </div>
+        </div>
+        <br></br>
+        <div className="flex items-center flex-wrap-reverse gap-4 justify-center">
+          <div className="max-w-lg">
+              <h1 className='text-2xl font-bold mb-3'>Verifioitu opiskelija -merkki</h1>
+              <p>Kirjautumalla sisään koulusi sähköpostilla ja vahvistamalla sen, saat verifioidun opiskelijan merkin arvosteluusi.
+              Arvostelun voi jättää myös kirjautumatta sisään! 
+              </p>
+          </div>
+          <div>
+        <FaCheckCircle
+          className="w-60 h-60"
+        />
+         </div>
         </div>
       <h1 className="text-3xl font-bold">Alustan koulut</h1>
       <div className="flex flex-wrap justify-center">
