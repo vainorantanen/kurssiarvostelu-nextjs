@@ -2,7 +2,7 @@ import prisma from "@/db";
 import { NextResponse } from "next/server";
 const jwt = require('jsonwebtoken')
 
-export async function POST(req: any) {
+export async function POST(req: any): Promise<NextResponse> {
     try {
         const { id, token } = await req.json()
         
