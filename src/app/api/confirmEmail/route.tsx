@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken')
 export async function POST(req: any): Promise<NextResponse> {
     try {
         const { id, token } = await req.json()
-        
-        console.log('backend', id, token)
  
         if (!id || !token) {
             return NextResponse.json(

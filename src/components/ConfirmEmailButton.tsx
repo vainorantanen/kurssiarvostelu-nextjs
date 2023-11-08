@@ -14,7 +14,6 @@ export default function ConfirmEmailButton({ userId, token }: ConfirmEmailProps)
     e.preventDefault();
 
     try {
-      console.log('sending id and token', userId, token)
       const confirmRes = await fetch('/api/confirmEmail', {
         method: "POST",
         headers: {
@@ -24,7 +23,6 @@ export default function ConfirmEmailButton({ userId, token }: ConfirmEmailProps)
       })
 
       if (confirmRes.ok) {
-        console.log('confirmation ok')
         router.push('/login')
       }
     } catch (error) {
