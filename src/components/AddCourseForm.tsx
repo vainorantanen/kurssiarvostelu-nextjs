@@ -55,7 +55,7 @@ export default function AddCourseForm({ schoolName, addCourse }: AddCourseProps)
           type="text"
           name="lang"
           className="w-64 px-3 py-2 border rounded focus:outline-none text-black"
-          placeholder="kieli (esim. fi)"
+          placeholder="Opintopisteet (esim. 5)"
           value={credits}
           onChange={(e) => setCredits(e.target.value)}
         />

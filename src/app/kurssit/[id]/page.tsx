@@ -6,13 +6,9 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FaStar, FaCheckCircle } from 'react-icons/fa';
-import { User } from "@prisma/client";
-
-/*
-async function getCourse(courseId: string) {
-  return prisma.course.findUnique({ where: { id: courseId } });
-}
-*/
+import { Review, User } from "@prisma/client";
+import { formatDistanceToNow } from 'date-fns';
+import dayjs from "dayjs";
 
 async function getCourse(courseId: string) {
   "use server"
@@ -124,8 +120,8 @@ async function deleteReview(id: string) {
             <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/koulut/${course.universityOrgIds[0]}`}>Takaisin</Link>
   </button>
-  <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi}</h1>
-  <p className="mb-2">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
+  <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi}, {course.code}</h1>
+  <p className="mb-2 text-xl">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/lisaa-arvostelu/${course.id}`}>Arvostele tämä kurssi</Link>
   </button>
@@ -201,7 +197,18 @@ async function deleteReview(id: string) {
                 {/* Reviews */}
                 { reviewsOfCourse.length > 0 ? (
                   reviewsOfCourse.map((review) => (
-                    <div key={review.id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg">
+                    <div key={review.id} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg
+                    flex flex-wrap gap-3">
+                      <div className={`flex flex-col text-black text-center font-bold`}>
+                        <div className={`rounded p-2 ${(review.rating + review.expectations + review.benefit
+                        + review.materials)/4 > 3 ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                        <p>Yhteensä</p>
+                        <p className="text-xl">{(review.rating + review.expectations + review.benefit
+                        + review.materials)/4}</p>
+                        </div>
+                        </div>
+                        <div>
+                         <p className="text-xs text-black mb-2">{dayjs(review.createdAt).format('DD.MM.YYYY')}</p>
                         {review.writerIsVerified && (
                         <div className="mb-2 flex items-center">
                           <FaCheckCircle className="text-blue-500 mr-2" />
@@ -210,17 +217,73 @@ async function deleteReview(id: string) {
                       )}
                         <p className="text-black mb-2 whitespace-break-spaces">{review.description}</p>
     
-                      <div className="flex items-center text-black">
-                        <p className="mr-2">Arvostelu</p>
-                        {[...Array(review.rating)].map((_, index) => (
-                          <FaStar key={index} className="text-yellow-500" />
-                        ))}
-                      </div>
-                      <p className="text-black">Saatu arvosana {review.grade}</p>
+                      <div>
+                      <table className="table-auto mb-2">
+  <tbody>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Yleisarvosana</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(review.rating)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Kurssi vastasi odotuksia</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(review.expectations)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Kurssin materiaalit</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(review.materials)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Hyöty muissa opinnoissa tai työelämässä</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(review.benefit)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Saatu arvosana </p>
+      </td>
+      <td>
+        <p className="text-black">{review.grade}</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Työmäärä (1-5) </p>
+      </td>
+      <td>
+        <p className="text-black">{review.workload}</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+                        </div>
                       {userFromDb && (userFromDb.email === process.env.ADMIN
                       || userFromDb.id === review.userId) && (
                         <DeleteReviewButton id={review.id} deleteReview={deleteReview}/>
                       )}
+                    </div>
                     </div>
                   ))
                 ) : (

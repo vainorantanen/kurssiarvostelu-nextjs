@@ -21,7 +21,9 @@ async function getCourse(courseId: string) {
 
 async function addReview(description: string,
   rating: number, grade: number, year: string, workload: number,
-  courseSisuId: string) {
+  courseSisuId: string, expectations: number,
+  materials: number,
+  benefit: number,) {
   "use server"
 
   const session = await getServerSession(authOptions)
@@ -29,7 +31,9 @@ async function addReview(description: string,
   if (typeof description !== "string" || description.length === 0
   || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number'
   || !year || typeof year !== 'string' || !workload || typeof workload !== 'number'
-  || !courseSisuId || typeof courseSisuId !== 'string' || courseSisuId.length === 0) {
+  || !courseSisuId || typeof courseSisuId !== 'string' || courseSisuId.length === 0
+  || !expectations || typeof expectations !== 'number' || !materials
+  || typeof materials !== 'number' || !benefit || typeof benefit !== 'number') {
       throw new Error("Invalid inputs")
     }
 
@@ -46,6 +50,9 @@ async function addReview(description: string,
       year,
       workload,
       courseSisuId,
+      expectations,
+      materials,
+      benefit,
       writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
     user: {
       connect: {
@@ -63,6 +70,9 @@ async function addReview(description: string,
       year,
       workload,
       courseSisuId,
+      expectations,
+      materials,
+      benefit,
       writerIsVerified: false
   } })
     redirect('/kiitos-arvostelusta')

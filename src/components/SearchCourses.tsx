@@ -144,7 +144,6 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
                                   <p className="text-lg font-semibold text-blue-500 hover:underline">
                                     {course.name}, {course.code} ({course.credits.min === course.credits.max ? course.credits.min : `${course.credits.min} - ${course.credits.max}`}op)
                                   </p>
-                                  <p className="text-black text-sm">Kieli: {course.lang}</p>
                                   <p className="text-black">{reviewCount} {reviewCount === 1 ? 'Arvostelu' : 'Arvostelua'}</p>
                                   <div className="flex items-center text-black">
                                     <p className="mr-2">{averageRating.toFixed(1)} tähteä</p>

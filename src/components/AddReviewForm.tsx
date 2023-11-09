@@ -10,13 +10,19 @@ type AddReviewProps = {
     grade: number,
     year: string,
     workload: number,
-    courseSisuId: string
+    courseSisuId: string,
+    expectations: number,
+    materials: number,
+    benefit: number,
   ) => void;
 };
 
 export default function AddReviewForm({ id, addReview }: AddReviewProps) {
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState(0);
+  const [benefit, setBenefit] = useState(0);
+  const [expectation, setExpectation] = useState(0);
+  const [materials, setMaterials] = useState(0);
   const [grade, setGrade] = useState(5); // Initialize grade as an empty string
   const [year, setYear] = useState("1. vuonna"); // Initial year value
   const [ workload, setWorkload ] = useState(1)
@@ -30,7 +36,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
       grade >= 1 &&
       grade <= 5
     ) {
-      addReview(description, rating, Number(grade), year, workload, id );
+      addReview(description, rating, Number(grade), year, workload, id, expectation, materials, benefit );
       setDescription("");
       setRating(0);
       setGrade(5); // Reset grade to an empty string
@@ -47,13 +53,13 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
       <textarea
         name="description"
         className="w-full h-40 px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
-        placeholder="Kirjoita arvostelu tähän"
+        placeholder="Kirjoita avoin arvostelu tähän"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
 
 <div className="my-4 ">
-        <p className="text-black">Anna kurssille arvosana (1-5 tähteä)</p>
+        <p className="text-black">Anna kurssille yleinen arvosana (1-5 tähteä)</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -69,8 +75,59 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
         </div>
       </div>
 
+      <div className="my-4 ">
+        <p className="text-black">Kuinka hyvin kurssi vastasi odotuksiasi? (1-5 tähteä)</p>
+        <div className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`cursor-pointer text-3xl ${
+                star <= expectation ? "text-yellow-500" : "text-gray-400"
+              }`}
+              onClick={() => handleStarClick(star, setExpectation)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="my-4 ">
+        <p className="text-black">Kurssilla käytettyjen materiaalien (luentokalvot, kirjat jne.) laatu (1-5 tähteä)</p>
+        <div className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`cursor-pointer text-3xl ${
+                star <= materials ? "text-yellow-500" : "text-gray-400"
+              }`}
+              onClick={() => handleStarClick(star, setMaterials)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="my-4 ">
+        <p className="text-black">Kurssista on hyötyä muissa opinnoissa tai työelämässä (1-5 tähteä)</p>
+        <div className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`cursor-pointer text-3xl ${
+                star <= benefit ? "text-yellow-500" : "text-gray-400"
+              }`}
+              onClick={() => handleStarClick(star, setBenefit)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+
       <div className="my-4">
-        <p className="text-black">Arvioi kursisn työmäärää (1 = vähän, 5 = liikaa)</p>
+        <p className="text-black">Arvioi kurssin työmäärää suhteessa opintopisteisiin (1 = vähän, 3 = sopiva, 5 = liikaa)</p>
         <input
           type="number"
           id="workload"

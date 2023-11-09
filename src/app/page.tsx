@@ -40,7 +40,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <h1 className="text-4xl my-4 font-bold">Femma</h1>
+      <h1 className="text-4xl my-4 font-bold">Selaa ja arvostele yliopistokursseja anonyymisti.</h1>
       <div className="h-64">
         <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.fi.localeCompare(b.name.fi))}/>
         </div>

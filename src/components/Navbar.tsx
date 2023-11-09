@@ -22,15 +22,16 @@ export default function Navbar() {
           </button>
         </div>
         <div className="hidden md:flex space-x-4">
-          <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-            <Link href="/">Etusivu</Link>
-          </button>
-          <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+          {!session && (
+            <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
             <Link href="/login">Kirjaudu</Link>
           </button>
+          )}
           {session ? (
             <span className="text-white">
               Kirjautunut: <span className="text-white font-semibold">{session?.user?.name}</span>
+              <br></br>
+              {session.user?.email}
             </span>
           ) : null}
           {session ? (
