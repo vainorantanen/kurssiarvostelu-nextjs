@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 type AddReviewProps = {
   id: string;
@@ -27,6 +28,8 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
   const [grade, setGrade] = useState(5); // Initialize grade as an empty string
   const [year, setYear] = useState("1. vuonna"); // Initial year value
   const [ workload, setWorkload ] = useState(1)
+  const [ captcha, setCaptcha ] = useState<string | null>()
+  const [error, setError] = useState("");
 
   const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
 
@@ -35,6 +38,11 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
   };
 
   const handleAddReview = () => {
+
+    if (!captcha && sessionIsNull) {
+      setError("Todista, ettet ole robotti");
+      return
+    }
     // Check if grade is a number and between 1 and 5
     if (
       // joko sessio ei ole null eli käyttäjä on kirjautunut sisään => ei tarvii enää accept terms
@@ -203,15 +211,24 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
       className="ml-2 h-4 w-4 border rounded-sm focus:ring-2 focus:ring-blue-500 text-blue-500"
     />
 </div>
-
+  {sessionIsNull && (
+    <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} className="mx-auto"
+    onChange={setCaptcha}
+    />
+  )}
       {/* Button to add review - enable only when terms are accepted */}
       <button
-        className={`w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 ${!acceptedTerms && "opacity-50 cursor-not-allowed"}`}
+        className={`w-full bg-blue-500 text-white py-2 my-1 rounded hover:bg-blue-600 ${!acceptedTerms && "opacity-50 cursor-not-allowed"}`}
         onClick={handleAddReview}
         disabled={!acceptedTerms}
       >
         Lisää arvostelu
       </button>
+      {error && (
+            <div className="bg-red-500 my-2 text-white w-fit text-sm py-1 px-3 rounded-md mt-2">
+              {error}
+            </div>
+          )}
     </div>
   );
 }
