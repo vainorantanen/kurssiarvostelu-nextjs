@@ -27,7 +27,7 @@ export default function RegisterForm() {
       setError("Kaikki kentät ovat pakollisia.");
       return;
     }
-    console.log(captcha)
+
     if (!captcha) {
       setError("Todista, ettet ole robotti");
       return;
