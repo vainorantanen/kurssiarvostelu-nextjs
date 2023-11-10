@@ -6,7 +6,7 @@ export default function ThankYou() {
       <h1 className="text-4xl font-bold mb-4">Kiitos arvostelusta!</h1>
       <Link
         href="/"
-        className="border border-slate-300 text-slate-300 px-2 py-1 rounded hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
+        className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
       >
         Siirry etusivulle
       </Link>

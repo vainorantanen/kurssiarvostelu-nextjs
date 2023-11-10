@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type AddReviewProps = {
   id: string;
+  sessionIsNull: boolean;
   addReview: (
     description: string,
     rating: number,
@@ -17,7 +18,7 @@ type AddReviewProps = {
   ) => void;
 };
 
-export default function AddReviewForm({ id, addReview }: AddReviewProps) {
+export default function AddReviewForm({ id, addReview, sessionIsNull }: AddReviewProps) {
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState(0);
   const [benefit, setBenefit] = useState(0);
@@ -27,9 +28,18 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
   const [year, setYear] = useState("1. vuonna"); // Initial year value
   const [ workload, setWorkload ] = useState(1)
 
+  const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
+
+  const handleTermsCheckbox = () => {
+    setAcceptedTerms(!acceptedTerms);
+  };
+
   const handleAddReview = () => {
     // Check if grade is a number and between 1 and 5
     if (
+      // joko sessio ei ole null eli käyttäjä on kirjautunut sisään => ei tarvii enää accept terms
+      // tai sitten käyttöehdot on hyväksytty
+      (!sessionIsNull || acceptedTerms) &&
       description.trim() !== "" &&
       rating > 0 &&
       !isNaN(Number(grade)) &&
@@ -49,7 +59,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto rounded shadow-lg bg-white">
+    <div className="p-4 max-w-xl mx-auto rounded shadow-lg bg-white">
       <textarea
         name="description"
         className="w-full h-40 px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
@@ -58,8 +68,8 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
         onChange={(e) => setDescription(e.target.value)}
       />
 
-<div className="my-4 ">
-        <p className="text-black">Anna kurssille yleinen arvosana (1-5 tähteä)</p>
+<div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Anna kurssille yleinen arvosana</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -75,8 +85,8 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
         </div>
       </div>
 
-      <div className="my-4 ">
-        <p className="text-black">Kuinka hyvin kurssi vastasi odotuksiasi? (1-5 tähteä)</p>
+      <div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Kuinka hyvin kurssi vastasi odotuksiasi?</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -92,8 +102,8 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
         </div>
       </div>
 
-      <div className="my-4 ">
-        <p className="text-black">Kurssilla käytettyjen materiaalien (luentokalvot, kirjat jne.) laatu (1-5 tähteä)</p>
+      <div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Kurssilla käytettyjen materiaalien (luentokalvot, kirjat tms.) laatu</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -109,8 +119,8 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
         </div>
       </div>
 
-      <div className="my-4 ">
-        <p className="text-black">Kurssista on hyötyä muissa opinnoissa tai työelämässä (1-5 tähteä)</p>
+      <div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Kurssista on hyötyä muissa opinnoissa tai työelämässä</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -127,7 +137,8 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
       </div>
 
       <div className="my-4">
-        <p className="text-black">Arvioi kurssin työmäärää suhteessa opintopisteisiin (1 = vähän, 3 = sopiva, 5 = liikaa)</p>
+        <p className="text-black">Arvioi kurssin työmäärää suhteessa opintopisteisiin</p>
+        <p className="text-black mb-1">(1 = vähän, 3 = sopiva, 5 = liikaa)</p>
         <input
           type="number"
           id="workload"
@@ -155,7 +166,7 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
       </div>
 
       <div className="my-4">
-        <p className="text-black">Milloin suoritit kurssin?</p>
+        <p className="text-black">Missä vaiheessa opintoja suoritit kurssin?</p>
         <select
           value={year}
           onChange={(e) => setYear(e.target.value)}
@@ -171,9 +182,33 @@ export default function AddReviewForm({ id, addReview }: AddReviewProps) {
         </select>
       </div>
 
+      <div className="my-4 flex items-center">
+  <p className="text-black">
+    Onhan arvostelusi asiallinen? {sessionIsNull && (
+      <>
+        Hyväksyn palvelun{" "}
+        <a href="/kayttoehdot" target="_blank" className="underline">
+          käyttöehdot
+        </a>
+        :
+      </>
+    )}
+  </p>
+    <input
+      type="checkbox"
+      id="terms"
+      name="terms"
+      checked={acceptedTerms}
+      onChange={handleTermsCheckbox}
+      className="ml-2 h-4 w-4 border rounded-sm focus:ring-2 focus:ring-blue-500 text-blue-500"
+    />
+</div>
+
+      {/* Button to add review - enable only when terms are accepted */}
       <button
-        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+        className={`w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 ${!acceptedTerms && "opacity-50 cursor-not-allowed"}`}
         onClick={handleAddReview}
+        disabled={!acceptedTerms}
       >
         Lisää arvostelu
       </button>

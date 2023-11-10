@@ -31,8 +31,11 @@ export default function AddCourseForm({ schoolName, addCourse }: AddCourseProps)
 
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-3xl font-bold text-white mb-2">Lisää uusi kurssi</h1>
+      <h1 className="text-3xl font-bold text-white mb-2">Ehdota kurssin lisäystä</h1>
+      <div className="p-4 max-w-xl mx-auto rounded shadow-lg bg-white text-black my-3">
       <h2 className="text-xl font-semibold my-2 text-white-600">Koululle: {schoolName}</h2>
+      <p className="my-2">Ylläpito tarkistaa kaikki ehdotetut kurssien liisäykset ennen niiden lisäämistä alustalle.</p>
+      </div>
       <div className="flex flex-col gap-4">
         <input
           type="text"
@@ -63,7 +66,7 @@ export default function AddCourseForm({ schoolName, addCourse }: AddCourseProps)
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
           onClick={handleaddCourse}
         >
-          Lisää
+          Lähetä
         </button>
       </div>
     </div>

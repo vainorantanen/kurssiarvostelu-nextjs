@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function RegisterForm() {
   const [name, setName] = useState("");
@@ -10,14 +11,25 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [ captcha, setCaptcha ] = useState<string | null>()
 
   const router = useRouter();
+
+  const handleTermsCheckbox = () => {
+    setAcceptedTerms(!acceptedTerms);
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    if (!name || !email || !password || !verifyPassword) {
+    if (!name || !email || !password || !verifyPassword || !acceptedTerms) {
       setError("Kaikki kentät ovat pakollisia.");
+      return;
+    }
+    console.log(captcha)
+    if (!captcha) {
+      setError("Todista, ettet ole robotti");
       return;
     }
   
@@ -84,7 +96,7 @@ export default function RegisterForm() {
   return (
     <div className="grid place-items-center h-screen">
       <div className="bg-blue-500 shadow-lg p-5 rounded-lg text-black">
-        <h1 className="text-xl font-bold my-4">Rekiströidy</h1>
+        <h1 className="text-xl font-bold my-4">Rekisteröidy</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
@@ -111,6 +123,27 @@ export default function RegisterForm() {
           placeholder="Vahvista salasana"
           className="bg-white text-black rounded-lg px-3 py-2"
         />
+       <div className="my-4 flex">
+        <p className="text-black">
+          Hyväksyn palvelun{" "}
+          <a href="/kayttoehdot" target='_blank' className="underline">
+            käyttöehdot
+          </a>
+          :
+        </p>
+        <input
+          type="checkbox"
+          id="terms"
+          name="terms"
+          checked={acceptedTerms}
+          onChange={handleTermsCheckbox}
+          className="ml-2 h-4 w-4 mt-1 border rounded-sm focus:ring-2 focus:ring-blue-500 text-blue-500"
+        />
+      </div>
+
+      <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} className="mx-auto"
+      onChange={setCaptcha}
+      />
           <button className="bg-blue-600 text-white font-bold cursor-pointer px-6 py-2">
             Rekisteröidy
           </button>

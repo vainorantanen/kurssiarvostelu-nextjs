@@ -83,6 +83,9 @@ async function addReview(description: string,
 export default async function SingleCoursePage({ params }: any) {
   const course = await getCourse(params.id);
 
+  const session = await getServerSession(authOptions)
+  const sessionIsNull = session == null
+
   if (!course) {
     return (
       <div>
@@ -100,9 +103,26 @@ export default async function SingleCoursePage({ params }: any) {
       <Link href={`/kurssit/${course.id}`} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
         Takaisin
       </Link>
-      <h1 className="text-2xl font-bold my-4">Arvostele {course.name.fi}</h1>
+      <h1 className="text-2xl font-bold my-4">Arvostele {course.name.fi}, {course.code} ({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</h1>
+      {sessionIsNull && (
+      <div className="p-4 max-w-xl mx-auto rounded shadow-lg bg-white text-black my-3">
+        <h2 className="text-lg font-semibold mb-2">Huomasimme, että et ole kirjautuneena sisään.</h2>
+        <p className="text-sm">Voit jättää arvostelun kirjautumattakin, mutta luodessasi profiilin koulusi sähköpostilla 
+          arvosteluihisi lisätään verifioidun opiskelijan merkki.
+        </p>
+        <p className="text-sm">Kirjautumalla sisään pystyt myös halutessasi poistamaan omia arviointejasi.</p>
+        <div className="flex flex-col gap-2">
+        <Link href='/login' className="mt-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+        Kirjaudu
+      </Link>
+        <Link href='/register' className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+        Rekisteröidy
+      </Link>
+          </div>
+      </div>
+    )}
       <div>
-        <AddReviewForm id={course.id} addReview={addReview}/>
+        <AddReviewForm id={course.id} addReview={addReview} sessionIsNull={sessionIsNull} />
       </div>
     </div>
   );

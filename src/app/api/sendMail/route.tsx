@@ -14,7 +14,7 @@ export async function POST(req: any) {
     }
 
     const token = jwt.sign({ id: user.id }, process.env.NEXTAUTH_SECRET, { expiresIn: '1d' })
-    const confirmLink = process.env.NODE_ENV === 'production' ? `https://kurssiarvostelu-nextjs.vercel.app/vahvista-sahkoposti/${user.id}/${token}` :
+    const confirmLink = process.env.NODE_ENV === 'production' ? `https://femma.app/vahvista-sahkoposti/${user.id}/${token}` :
       `http://localhost:3000/vahvista-sahkoposti/${user.id}/${token}`
 
     const transporter = nodemailer.createTransport({

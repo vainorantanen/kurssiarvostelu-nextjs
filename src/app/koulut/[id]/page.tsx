@@ -64,7 +64,7 @@ export default async function SingleschoolPage({ params }: any) {
   </button>
   <p className="mt-4 ml-1">Eikö kurssiasi ole täällä? </p>
   <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-    <Link href={`/lisaa-kurssi/${school.id}`}>Lisää kurssi</Link>
+    <Link href={`/lisaa-kurssi/${school.id}`}>Ehdota kurssin lisäystä</Link>
   </button>
   </div>
       <SearchCourses allReviews={allReviews}

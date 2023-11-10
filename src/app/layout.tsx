@@ -6,7 +6,7 @@ import { AuthProvider } from "./Providers"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "Yliopistojen kurssiarvostelu alusta",
+  title: "Selaa ja anna yliopistokursseille arvosteluja anonyymisti. Katso, mitä mieltä muut ovat yliopistokursseista.",
 }
 
 export default function RootLayout({
