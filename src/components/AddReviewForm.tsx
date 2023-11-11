@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
+import Loading from "./Loading";
 
 type AddReviewProps = {
   id: string;
@@ -30,6 +31,7 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
   const [ workload, setWorkload ] = useState(1)
   const [ captcha, setCaptcha ] = useState<string | null>()
   const [error, setError] = useState("");
+  const [ loading, setLoading ] = useState<boolean>(false)
 
   const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
 
@@ -229,6 +231,9 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
               {error}
             </div>
           )}
+          {loading && (
+          <Loading />
+        )}
     </div>
   );
 }

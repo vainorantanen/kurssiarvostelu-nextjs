@@ -57,6 +57,10 @@ const sortedCourses = [...filteredCourses].sort((a, b) => {
         return a.name.localeCompare(b.name);
     } else if (sortBy === "name-desc") {
         return b.name.localeCompare(a.name);
+    } else if (sortBy === 'most-credits') {
+      return b.credits.max - a.credits.max
+    } else if (sortBy === 'min-credits') {
+      return a.credits.min - b.credits.min
     }
     return 0;
 });
@@ -74,7 +78,7 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
             <div className="md:col-span-1">
                 {/* Sidebar */}
                 <div className="p-4">
-                <h2 className="text-lg font-semibold mb-2">Suodata</h2>
+                <h2 className="text-lg font-semibold mb-2">Valitse koulutusohjelma</h2>
                     
                     <select
                     className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
@@ -100,6 +104,8 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
                         <option value="">Ei mitään</option>
                         <option value="name-asc">Nimi (A-Z)</option>
                         <option value="name-desc">Nimi (Z-A)</option>
+                        <option value="most-credits">Laajimmat (op)</option>
+                        <option value="min-credits">Suppeimmat (op)</option>
                     </select>
                     {currentPage == 1 && (
                       <input

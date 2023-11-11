@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
+import Loading from "./Loading";
 
 export default function RegisterForm() {
   const [name, setName] = useState("");
@@ -13,8 +14,8 @@ export default function RegisterForm() {
   const [verifyPassword, setVerifyPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [ captcha, setCaptcha ] = useState<string | null>()
-
-  const router = useRouter();
+  const [ registerSuccess, setRegisterSuccess ] = useState<boolean>(false)
+  const [ loading, setLoading ] = useState<boolean>(false)
 
   const handleTermsCheckbox = () => {
     setAcceptedTerms(!acceptedTerms);
@@ -37,7 +38,7 @@ export default function RegisterForm() {
       setError("Salasana ja vahvistus eivät täsmää.");
       return;
     }
-
+    setLoading(true)
     try {
       const resUserExists = await fetch("api/userExists", {
         method: "POST",
@@ -81,7 +82,14 @@ export default function RegisterForm() {
         })
 
         if (sendMailRes.ok) {
-          router.push("/kiitos-rekisteroitymisesta");
+          //router.push("/kiitos-rekisteroitymisesta");
+          setRegisterSuccess(true)
+          // Scroll to section with id "register-email-confirm"
+        const registerEmailConfirmSection = document.getElementById('register-email-confirm');
+        if (registerEmailConfirmSection) {
+          registerEmailConfirmSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        setLoading(false)
         } else {
           console.log("Sending email failed.");
         }
@@ -93,8 +101,40 @@ export default function RegisterForm() {
     }
   };
 
+  const handleResendEmail = async () => {
+    console.log('sending email to ', email)
+    try {
+      await fetch('/api/sendMail', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+      }),
+    })
+  } catch(error) {
+    console.log(error, 'error sending email')
+  }
+  }
+
   return (
-    <div className="grid place-items-center h-screen">
+    <div className="grid place-items-center min-h-screen">
+      {registerSuccess && (
+          <div
+          id="register-email-confirm"
+          className="p-4 max-w-lg mx-auto rounded shadow-lg bg-white text-black my-3">
+            <h1 className="text-2xl font-bold my-3">Käyttäjä luotu onnistuneesti.</h1>
+            <p className="text-2xl my-2">Lähetimme sinulle vahvistussähköpostin. Vahvista vielä sähköpostisi.</p>
+            <p>Etkö saanut vahvistussähköpostia?</p>
+            <button
+            onClick={handleResendEmail}
+            className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+                Lähetä uusi vahvistus
+            </button>
+        </div>
+      )}
+      {!registerSuccess && (
       <div className="bg-blue-500 shadow-lg p-5 rounded-lg text-black">
         <h1 className="text-xl font-bold my-4">Rekisteröidy</h1>
 
@@ -153,12 +193,15 @@ export default function RegisterForm() {
               {error}
             </div>
           )}
-
+              {loading && (
+          <Loading />
+        )}
           <Link className="text-sm mt-3 text-right text-black" href={"/login"}>
             Onko sinulla jo käyttäjä? <span className="underline">Kirjaudu</span>
           </Link>
         </form>
       </div>
+)}
     </div>
   );
 }
