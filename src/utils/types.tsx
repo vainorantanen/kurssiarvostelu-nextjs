@@ -48,3 +48,4 @@ type SchoolName = {
   en: string;
   fi: string
 }
+
