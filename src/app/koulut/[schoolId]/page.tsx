@@ -1,38 +1,32 @@
-import { getSchool } from "@/app/lib/data";
+import { getKoulutusOhjelmat, getSchool, getSearchCoursesPages } from "@/app/lib/data";
+import ChooseSearch from "@/app/ui/schools/courses/ChooseSearch";
+import CoursesList from "@/app/ui/schools/courses/courseslist";
+import Pagination from "@/app/ui/schools/pagination";
 import SearchCourses from "@/components/SearchCourses";
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-// school = organisation
-
-async function getKoulutusOhjelmat(schoolId: string) {
-  "use server"
-
-  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/`)
-  const data = await res.json() as Koulutusohjelma[]
-  
-  const koulutusOhjelmat = data
-  .filter(d => d.universityOrgId === schoolId && d.parentId !== null && d.parentId !== schoolId)
-  .sort((a, b) => a.name.fi.localeCompare(b.name.fi));
-  return koulutusOhjelmat
-}
-
 async function getAllReviews() {
   return prisma.review.findMany()
 }
 
-const getSearchCourses = async (orgId: string, universityOrgId: string) => {
-  "use server"
 
-  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?limit=1000&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
-  const resultData = await res.json()
-  return resultData.searchResults as Course[]
-}
 
-export default async function SingleschoolPage({ params }: any) {
+export default async function SingleschoolPage({ params,
+  searchParams }: {params: any, searchParams?: {
+    orgId?: string;
+    page?: string;
+  }}) {
   const school = await getSchool(params.schoolId)
   const allReviews = await getAllReviews()
+
+  const orgId = searchParams?.orgId || 'tuni-org-1301000013';
+  const currentPage = Number(searchParams?.page) || 1;
+
+  const totalPages = await getSearchCoursesPages(orgId, school.id);
+
+    const koulutusohjelmat = await getKoulutusOhjelmat(params.schoolId)
 
   if (!school) {
     return (
@@ -58,11 +52,28 @@ export default async function SingleschoolPage({ params }: any) {
     <Link href={`/lisaa-kurssi/${school.id}`}>Ehdota kurssin lisäystä</Link>
   </button>
   </div>
-      <SearchCourses allReviews={allReviews}
-      schoolId={school.id} getSearchCourses={getSearchCourses}
-      getKoulutusOhjelmat={getKoulutusOhjelmat}
-      />
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div className="md:col-span-1">
+  <div className="py-4">
+    <ChooseSearch koulutusohjelmat={koulutusohjelmat}/>
     </div>
+  </div>
+  <div className="md:col-span-2">
+  <div className="grid grid-cols-1 gap-4">
+    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage}/>
+    </div>
+    </div>
+  </div>
+   <div className="mt-5 flex w-full justify-center">
+      <Pagination totalPages={totalPages} />
+   </div>
+ </div>
   );
 }
 
+/**
+ * <SearchCourses allReviews={allReviews}
+      schoolId={school.id} getSearchCourses={getSearchCourses}
+      getKoulutusOhjelmat={getKoulutusOhjelmat}
+      />
+ */
