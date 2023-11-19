@@ -133,7 +133,7 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
                               className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center"
                             >
                               <div className="mr-4">
-                                <Link href={`/kurssit/${course.id}`}>
+                                <Link href={`/koulut/${schoolId}/kurssit/${course.id}`}>
                                   <div className="relative w-16 h-16">
                                     <Image
                                       src={notebookImage}
@@ -146,7 +146,7 @@ const currentCourses = sortedCourses.slice(indexOfFirstCourse, indexOfLastCourse
                                 </Link>
                               </div>
                               <div>
-                                <Link href={`/kurssit/${course.id}`}>
+                                <Link href={`/koulut/${schoolId}/kurssit/${course.id}`}>
                                   <p className="text-lg font-semibold text-blue-500 hover:underline">
                                     {course.name}, {course.code} ({course.credits.min === course.credits.max ? course.credits.min : `${course.credits.min} - ${course.credits.max}`}op)
                                   </p>

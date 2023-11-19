@@ -1,19 +1,10 @@
+import { getSchool } from "@/app/lib/data";
 import SearchCourses from "@/components/SearchCourses";
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 // school = organisation
-
-async function getSchool(schoolId: string) {
-  "use server"
-
-  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/${schoolId}`)
-  const data = await res.json() as School
-  
-  return data
-  
-}
 
 async function getKoulutusOhjelmat(schoolId: string) {
   "use server"
@@ -40,7 +31,7 @@ const getSearchCourses = async (orgId: string, universityOrgId: string) => {
 }
 
 export default async function SingleschoolPage({ params }: any) {
-  const school = await getSchool(params.id);
+  const school = await getSchool(params.schoolId)
   const allReviews = await getAllReviews()
 
   if (!school) {

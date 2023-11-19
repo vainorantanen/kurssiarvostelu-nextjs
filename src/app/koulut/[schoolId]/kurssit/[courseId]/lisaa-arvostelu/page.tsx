@@ -5,19 +5,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import AddReviewForm from "@/components/AddReviewForm";
+import { getCourse } from '@/app/lib/data';
 
 const emailEndings = [
   "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
   "arcada.fi"
 ]
-
-async function getCourse(courseId: string) {
-  "use server"
-
-  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-units/v1/${courseId}`)
-  const resultData = await res.json()
-  return resultData as SingleCourse
-}
 
 async function addReview(description: string,
   rating: number, grade: number, year: string, workload: number,
@@ -81,7 +74,7 @@ async function addReview(description: string,
 }
 
 export default async function SingleCoursePage({ params }: any) {
-  const course = await getCourse(params.id);
+  const course = await getCourse(params.courseId)
 
   const session = await getServerSession(authOptions)
   const sessionIsNull = session == null

@@ -58,8 +58,8 @@ async function deleteReview(id: string) {
 
 
   export default async function SingleCoursePage({ params }: any) {
-    const course = await getCourse(params.id);
-    const reviewsOfCourse = await getReviewsByCourse(params.id);
+    const course = await getCourse(params.courseId);
+    const reviewsOfCourse = await getReviewsByCourse(params.courseId);
     const session = await getServerSession(authOptions)
 
     if (!course) {
@@ -123,7 +123,7 @@ async function deleteReview(id: string) {
   <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi}, {course.code}</h1>
   <p className="mb-2 text-xl">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-    <Link href={`/lisaa-arvostelu/${course.id}`}>Arvostele tämä kurssi</Link>
+    <Link href={`/koulut/${params.schoolId}/kurssit/${params.courseId}/lisaa-arvostelu/`}>Arvostele tämä kurssi</Link>
   </button>
         
               <h2 className="text-2xl font-bold text-white mt-4 mb-2">Yhteenveto</h2>
