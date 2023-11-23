@@ -1,7 +1,8 @@
-import { getSearchCourses } from "@/app/lib/data";
+import { getReviewData, getSearchCourses } from "@/app/lib/data";
 import Image from "next/image";
 import Link from "next/link";
 import notebookImage from '@/Assets/book.png'
+import { FaStar } from "react-icons/fa";
 
 export default async function CoursesList({
     orgId,
@@ -21,8 +22,21 @@ export default async function CoursesList({
         return null
     }
 
+    const courseIds = courses.map(c => c.id)
+    const reviewData = await getReviewData(courseIds)
+
     return (
-        courses.map(course => (
+        courses.map(course => {
+          const courseReviewData = reviewData.filter(d => d.courseSisuId === course.id)
+
+          const reviewCount = courseReviewData.length
+
+          // count the sum of ratings
+          const sum = courseReviewData.reduce((acc, review) => acc + review.rating, 0);
+
+          const averageRating = reviewCount > 0 ? sum / reviewCount : 0;
+
+          return (
             <div
             key={course.id}
             className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center"
@@ -45,9 +59,18 @@ export default async function CoursesList({
                 <p className="text-lg font-semibold text-blue-500 hover:underline">
                   {course.name}, {course.code} ({course.credits.min === course.credits.max ? course.credits.min : `${course.credits.min} - ${course.credits.max}`}op)
                 </p>
+                <p className="text-black">{reviewCount} {reviewCount === 1 ? 'Arvostelu' : 'Arvostelua'}</p>
+                 <div className="flex items-center text-black">
+                  <p className="mr-2">{averageRating.toFixed(1)} tähteä</p>
+                   {[...Array(Math.round(averageRating))].map((_, index) => (
+                     <FaStar key={index} className="text-yellow-500" />
+                      ))}
+                  </div>
               </Link>
             </div>
           </div>
-        ))
-    )
+          )
+        
+       }))
+       
   }

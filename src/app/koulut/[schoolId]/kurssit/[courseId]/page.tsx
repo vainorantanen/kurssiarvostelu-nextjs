@@ -10,6 +10,7 @@ import { Review, User } from "@prisma/client";
 import { formatDistanceToNow } from 'date-fns';
 import dayjs from "dayjs";
 import BackButton from "@/app/ui/schools/courses/BackButton";
+import { getReviewsByCourse } from "@/app/lib/data";
 
 
 async function getCourse(courseId: string) {
@@ -18,11 +19,6 @@ async function getCourse(courseId: string) {
   const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-units/v1/${courseId}`)
   const resultData = await res.json()
   return resultData as SingleCourse
-}
-
-
-async function getReviewsByCourse(courseSisuId: string) {
-  return prisma.review.findMany({ where: { courseSisuId } })
 }
 
 async function getUser(email: string) {
