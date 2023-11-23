@@ -1,5 +1,6 @@
 import { getKoulutusOhjelmat, getSchool, getSearchCoursesPages } from "@/app/lib/data";
 import ChooseSearch from "@/app/ui/schools/courses/ChooseSearch";
+import TextSearch from "@/app/ui/schools/courses/TextSearch";
 import CoursesList from "@/app/ui/schools/courses/courseslist";
 import Pagination from "@/app/ui/schools/pagination";
 import SearchCourses from "@/components/SearchCourses";
@@ -17,6 +18,7 @@ export default async function SingleschoolPage({ params,
   searchParams }: {params: any, searchParams?: {
     orgId?: string;
     page?: string;
+    query?: string;
   }}) {
   const school = await getSchool(params.schoolId)
   const allReviews = await getAllReviews()
@@ -25,7 +27,8 @@ export default async function SingleschoolPage({ params,
 
   const koulutusohjelmat = await getKoulutusOhjelmat(params.schoolId)
   const orgId = searchParams?.orgId || koulutusohjelmat[0].id || 'Valitse koulutusohjelma';
-  const totalPages = await getSearchCoursesPages(orgId, school.id);
+  const query = searchParams?.query || ''
+  const totalPages = await getSearchCoursesPages(orgId, school.id, query);
 
   if (!school) {
     return (
@@ -62,13 +65,14 @@ export default async function SingleschoolPage({ params,
   <div className="md:col-span-2">
   <div className="grid grid-cols-1 gap-4">
     <h1 className="text-2xl text-center font-bold">{koulutusohjelmat.find(k => k.id == orgId)?.name.fi}</h1>
-    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage} />
+    <TextSearch placeholder="Hae kurssia..."/>
+    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage} query={query}/>
+    <div className="mt-5 flex w-full justify-center text-center">
+      <Pagination totalPages={totalPages} />
+   </div>
     </div>
     </div>
   </div>
-   <div className="mt-5 flex w-full justify-center">
-      <Pagination totalPages={totalPages} />
-   </div>
  </div>
   );
 }

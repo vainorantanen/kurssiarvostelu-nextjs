@@ -7,13 +7,15 @@ export default async function CoursesList({
     orgId,
     universityOrgId,
     currentPage,
+    query
   }: {
     orgId: string;
     universityOrgId: string;
     currentPage: number;
+    query: string;
   }) { 
 
-    const courses = await getSearchCourses(orgId, universityOrgId, currentPage)
+    const courses = await getSearchCourses(orgId, universityOrgId, currentPage, query)
 
     if (!courses) {
         return null

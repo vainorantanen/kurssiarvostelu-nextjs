@@ -27,10 +27,17 @@ export async function getSchool(schoolId: string) {
     }
 }
 
-export async function getSearchCoursesPages(orgId: string, universityOrgId: string) {
+export async function getSearchCoursesPages(orgId: string, universityOrgId: string, query: string) {
     noStore()
+
+    var textQuery = "";
+
+    if (query && query.length > 0) {
+        textQuery = `fullTextQuery=${query}&`
+    }
+
     try {
-        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?limit=10&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
         const resultData = await res.json()
         //console.log(resultData)
         const totalPages = Math.ceil(Number(resultData.total)/Number(resultData.limit))
@@ -45,12 +52,18 @@ export async function getSearchCoursesPages(orgId: string, universityOrgId: stri
 const itemsPerPage = 10
 
 export async function getSearchCourses(orgId: string, universityOrgId: string,
-    currentPage: number
+    currentPage: number, query: string
     ){
     noStore()
   
+    var textQuery = "";
+
+    if (query && query.length > 0) {
+        textQuery = `fullTextQuery=${query}&`
+    }
+
     try {
-        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?limit=${itemsPerPage}&orgId=${orgId}&showMaxResults=false&start=${itemsPerPage*(currentPage-1)}&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&orgId=${orgId}&showMaxResults=false&start=${itemsPerPage*(currentPage-1)}&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
         const resultData = await res.json()
         return resultData.searchResults as Course[]
     } catch (error) {
@@ -74,4 +87,19 @@ export async function getKoulutusOhjelmat(schoolId: string) {
         console.error('getkoulutusOhjelmat error: ', error);
         throw new Error('Failed to fetch koulutusohjelmat');
     }
+  }
+
+export async function getSchools() {
+  
+    try {
+        const res = await fetch("https://sis-tuni.funidata.fi/kori/api/organisations")
+        const data = await res.json() as School[]
+        
+        const schools = data.filter(d => d.parentId == null)
+        return schools
+    } catch (error) {
+        console.error('getSchools error: ', error);
+        throw new Error('Failed to fetch koulut');
+    }
+    
   }
