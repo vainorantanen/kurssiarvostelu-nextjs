@@ -9,6 +9,8 @@ import { FaStar, FaCheckCircle } from 'react-icons/fa';
 import { Review, User } from "@prisma/client";
 import { formatDistanceToNow } from 'date-fns';
 import dayjs from "dayjs";
+import BackButton from "@/app/ui/schools/courses/BackButton";
+
 
 async function getCourse(courseId: string) {
   "use server"
@@ -113,14 +115,13 @@ async function deleteReview(id: string) {
           }
          })
 
+         //    <Link href={`/koulut/${course.universityOrgIds[0]}`}>Takaisin</Link>
         return (
           <div className="min-h-screen flex flex-col md:flex-row">
             {/* Summary and Chart on small screens (1/3 width) */}
             <div className="w-full md:w-2/5 p-4">
-            <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-    <Link href={`/koulut/${course.universityOrgIds[0]}`}>Takaisin</Link>
-  </button>
-  <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi}, {course.code}</h1>
+            <BackButton />
+  <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi || course.name.en}, {course.code}</h1>
   <p className="mb-2 text-xl">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/koulut/${params.schoolId}/kurssit/${params.courseId}/lisaa-arvostelu/`}>Arvostele tämä kurssi</Link>

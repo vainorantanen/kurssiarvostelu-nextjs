@@ -26,7 +26,7 @@ export default async function CoursesList({
             className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center"
           >
             <div className="mr-4">
-                                <Link href={`/koulut/${universityOrgId}/kurssit/${course.id}`}>
+                                <Link href={`/koulut/${universityOrgId}/kurssit/${course.id}?page=${currentPage}&orgId=${orgId}`}>
                                   <div className="relative w-16 h-16">
                                     <Image
                                       src={notebookImage}

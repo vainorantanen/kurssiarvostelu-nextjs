@@ -32,9 +32,9 @@ export async function getSearchCoursesPages(orgId: string, universityOrgId: stri
     try {
         const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?limit=10&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
         const resultData = await res.json()
-        console.log(resultData)
+        //console.log(resultData)
         const totalPages = Math.ceil(Number(resultData.total)/Number(resultData.limit))
-        console.log(totalPages)
+        //console.log(totalPages)
         return totalPages
     } catch (error) {
         console.error('getSearchCoursePages error: ', error);

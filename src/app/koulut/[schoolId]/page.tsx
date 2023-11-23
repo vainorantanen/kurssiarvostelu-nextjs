@@ -21,12 +21,11 @@ export default async function SingleschoolPage({ params,
   const school = await getSchool(params.schoolId)
   const allReviews = await getAllReviews()
 
-  const orgId = searchParams?.orgId || 'tuni-org-1301000013';
   const currentPage = Number(searchParams?.page) || 1;
 
+  const koulutusohjelmat = await getKoulutusOhjelmat(params.schoolId)
+  const orgId = searchParams?.orgId || koulutusohjelmat[0].id || 'Valitse koulutusohjelma';
   const totalPages = await getSearchCoursesPages(orgId, school.id);
-
-    const koulutusohjelmat = await getKoulutusOhjelmat(params.schoolId)
 
   if (!school) {
     return (
@@ -40,12 +39,14 @@ export default async function SingleschoolPage({ params,
     );
   }
 
+  console.log('passing orgid: ', orgId)
+
   return (
     <div className="min-h-screen">
       <h1 className="text-2xl mt-4 mb-4 text-center font-bold">{school.name.fi} Kurssit</h1>
       <div className="mt-2 mb-3">
       <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-    <Link href='/'>Takaisin</Link>
+    <Link href='/'>Etusivu</Link>
   </button>
   <p className="mt-4 ml-1">Eikö kurssiasi ole täällä? </p>
   <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
@@ -60,7 +61,8 @@ export default async function SingleschoolPage({ params,
   </div>
   <div className="md:col-span-2">
   <div className="grid grid-cols-1 gap-4">
-    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage}/>
+    <h1 className="text-2xl text-center font-bold">{koulutusohjelmat.find(k => k.id == orgId)?.name.fi}</h1>
+    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage} />
     </div>
     </div>
   </div>
