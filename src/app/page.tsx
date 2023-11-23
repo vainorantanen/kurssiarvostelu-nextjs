@@ -1,4 +1,3 @@
-import prisma from '@/db';
 import Link from 'next/link';
 
 import { getServerSession } from 'next-auth';
@@ -10,25 +9,9 @@ import schoolImage from '@/Assets/school.png'
 import booksPic from '@/Assets/books.png'
 import geometryPic from '@/Assets/geometry.png'
 import anonymPic from '@/Assets/anonym.png'
-import { redirect } from 'next/navigation';
 import { FaStar, FaCheckCircle } from 'react-icons/fa';
+import { getSchools } from './lib/data';
 
-/*
-function getSchools() {
-  return prisma.school.findMany()
-}
-*/
-
-async function getSchools() {
-  "use server"
-
-  const res = await fetch("https://sis-tuni.funidata.fi/kori/api/organisations")
-  const data = await res.json() as School[]
-  
-  const schools = data.filter(d => d.parentId == null)
-  return schools
-  
-}
 
 export default async function Home() {
 

@@ -35,6 +35,7 @@ model User {
   password String
   isVerified Boolean @default(false)
   reviews Review[]
+  createdAt   DateTime @default(now())
 }
 
 model CourseRequest {
@@ -43,4 +44,5 @@ model CourseRequest {
     code String
     credits String
     schoolName String
+    createdAt   DateTime @default(now())
 }
