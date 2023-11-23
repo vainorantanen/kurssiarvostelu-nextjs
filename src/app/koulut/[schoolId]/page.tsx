@@ -1,4 +1,4 @@
-import { getKoulutusOhjelmat, getSchool, getSearchCoursesPages } from "@/app/lib/data";
+import { getKoulutusOhjelmat, getReviewData, getSchool, getSearchCoursesPages } from "@/app/lib/data";
 import ChooseSearch from "@/app/ui/schools/courses/ChooseSearch";
 import TextSearch from "@/app/ui/schools/courses/TextSearch";
 import CoursesList from "@/app/ui/schools/courses/courseslist";
@@ -7,10 +7,6 @@ import SearchCourses from "@/components/SearchCourses";
 import prisma from "@/db";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
-async function getAllReviews() {
-  return prisma.review.findMany()
-}
 
 
 
@@ -21,7 +17,6 @@ export default async function SingleschoolPage({ params,
     query?: string;
   }}) {
   const school = await getSchool(params.schoolId)
-  const allReviews = await getAllReviews()
 
   const currentPage = Number(searchParams?.page) || 1;
 

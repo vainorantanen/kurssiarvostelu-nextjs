@@ -1,5 +1,6 @@
 "use server"
 
+import prisma from '@/db';
 import { unstable_noStore as noStore } from 'next/cache';
 
 export async function getCourse(courseId: string) {
@@ -75,6 +76,7 @@ export async function getSearchCourses(orgId: string, universityOrgId: string,
 // school = organisation
 
 export async function getKoulutusOhjelmat(schoolId: string) {
+    noStore()
     try {
         const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/`)
     const data = await res.json() as Koulutusohjelma[]
@@ -90,7 +92,7 @@ export async function getKoulutusOhjelmat(schoolId: string) {
   }
 
 export async function getSchools() {
-  
+    noStore()
     try {
         const res = await fetch("https://sis-tuni.funidata.fi/kori/api/organisations")
         const data = await res.json() as School[]
@@ -102,4 +104,40 @@ export async function getSchools() {
         throw new Error('Failed to fetch koulut');
     }
     
+  }
+
+  export async function getReviewData(courseIds: string[]) {
+    noStore()
+
+    try {
+        const res = await prisma.review.findMany({
+            where: {
+                courseSisuId: {
+                  in: courseIds,
+                },
+              },
+              select: {
+                id: true,
+                rating: true,
+                courseSisuId: true
+              },
+    })
+        return res
+    } catch (error) {
+        console.error('getReviewData error: ', error);
+        throw new Error('Failed to fetch koulut');
+    }
+
+  }
+
+  export async function getReviewsByCourse(courseSisuId: string) {
+    
+    noStore()
+    try {
+        const res = await prisma.review.findMany({ where: { courseSisuId } })
+        return res
+    } catch (error) {
+        console.error('getReviews error: ', error);
+        throw new Error('Failed to fetch reviews');
+    }
   }
