@@ -10,49 +10,7 @@ import { Review, User } from "@prisma/client";
 import { formatDistanceToNow } from 'date-fns';
 import dayjs from "dayjs";
 import BackButton from "@/app/ui/schools/courses/BackButton";
-import { getReviewsByCourse } from "@/app/lib/data";
-
-
-async function getCourse(courseId: string) {
-  "use server"
-
-  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-units/v1/${courseId}`)
-  const resultData = await res.json()
-  return resultData as SingleCourse
-}
-
-async function getUser(email: string) {
-  return prisma.user.findUnique({ where: { email } })
-}
-
-async function deleteReview(id: string) {
-    "use server"
-
-    const session = await getServerSession(authOptions)
-
-    const rev = await prisma.review.findUnique({ where: {id} })
-    if (!rev) {
-      throw new Error("Arvostelua ei löytynyt")
-    }
-
-    if (!session || !session.user || !session.user.email) {
-      throw new Error("Sessionia ei ole")
-    }
-
-    const userFromDb = await getUser(session.user.email)
-
-    if (!userFromDb) {
-      throw new Error("Käyttäjää ei löytynyt")
-    }
-
-    if (session.user.email !== process.env.ADMIN && userFromDb.id !== rev.userId) {
-      throw new Error("Vain admin tai arvostelun lisännyt voi poistaa arvostelun")
-    }
-
-    await prisma.review.delete({ where: { id } });
-
-    redirect('/poistettu-onnistuneesti')
-  }
+import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
 
 
   export default async function SingleCoursePage({ params }: any) {

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import AddReviewForm from "@/components/AddReviewForm";
 import { getCourse } from '@/app/lib/data';
+import BackButton from "@/app/ui/schools/courses/BackButton";
 
 const emailEndings = [
   "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
@@ -93,9 +94,7 @@ export default async function SingleCoursePage({ params }: any) {
 
   return (
     <div className="text-center mt-3 min-h-screen">
-      <Link href={`/kurssit/${course.id}`} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
-        Takaisin
-      </Link>
+      <BackButton />
       <h1 className="text-2xl font-bold my-4">Arvostele {course.name.fi}, {course.code} ({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</h1>
       {sessionIsNull && (
       <div className="p-4 max-w-xl mx-auto rounded shadow-lg bg-white text-black my-3">

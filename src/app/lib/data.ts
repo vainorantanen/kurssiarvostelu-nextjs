@@ -1,7 +1,10 @@
 "use server"
 
 import prisma from '@/db';
+import { getServerSession } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
+import { authOptions } from '../api/auth/[...nextauth]/options';
+import { redirect } from 'next/navigation';
 
 export async function getCourse(courseId: string) {
     noStore()
@@ -184,3 +187,35 @@ export async function getSchools() {
         throw new Error('Failed to fetch reviews');
     }
   }
+  
+  export async function getUser(email: string) {
+    return prisma.user.findUnique({ where: { email } })
+  }
+  
+  export async function deleteReview(id: string) {
+  
+      const session = await getServerSession(authOptions)
+  
+      const rev = await prisma.review.findUnique({ where: {id} })
+      if (!rev) {
+        throw new Error("Arvostelua ei löytynyt")
+      }
+  
+      if (!session || !session.user || !session.user.email) {
+        throw new Error("Sessionia ei ole")
+      }
+  
+      const userFromDb = await getUser(session.user.email)
+  
+      if (!userFromDb) {
+        throw new Error("Käyttäjää ei löytynyt")
+      }
+  
+      if (session.user.email !== process.env.ADMIN && userFromDb.id !== rev.userId) {
+        throw new Error("Vain admin tai arvostelun lisännyt voi poistaa arvostelun")
+      }
+  
+      await prisma.review.delete({ where: { id } });
+  
+      redirect('/poistettu-onnistuneesti')
+    }
