@@ -59,7 +59,7 @@ export default function ChooseSearch({ koulutusohjelmat, tiedekunnat }: { koulut
         {facultyId === '' || facultyId == 'none' ? (
           koulutusohjelmat.map((ohjelma) => (
             <option key={ohjelma.id} value={ohjelma.id}>
-              {ohjelma.name.fi} {ohjelma.id}
+              {ohjelma.name.fi}
             </option>
           ))
         ) : (
