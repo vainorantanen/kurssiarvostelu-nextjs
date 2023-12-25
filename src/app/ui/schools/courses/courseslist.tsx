@@ -8,18 +8,24 @@ export default async function CoursesList({
     orgId,
     universityOrgId,
     currentPage,
-    query
+    query,
+    orgRootId
   }: {
     orgId: string;
     universityOrgId: string;
     currentPage: number;
     query: string;
+    orgRootId: string;
   }) { 
 
-    const courses = await getSearchCourses(orgId, universityOrgId, currentPage, query)
+    const courses = await getSearchCourses(orgId, universityOrgId, currentPage, query, orgRootId)
 
     if (!courses) {
-        return null
+        return (
+          <div>
+            <h2 className="text-xl font-bold text-center py-4">Lisää rajaustekijöitä</h2>
+          </div>
+        )
     }
 
     const courseIds = courses.map(c => c.id)
