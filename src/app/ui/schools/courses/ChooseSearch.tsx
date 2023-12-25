@@ -3,13 +3,15 @@
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function ChooseSearch({ koulutusohjelmat }: { koulutusohjelmat: Koulutusohjelma[] }) {
+export default function ChooseSearch({ koulutusohjelmat, tiedekunnat }: { koulutusohjelmat: Koulutusohjelma[],
+  tiedekunnat: Koulutusohjelma[] }) {
   const searchParams = useSearchParams();
   const [orgId, setOrgId] = useState(searchParams.get('orgId') || '');
+  const [ facultyId, setFacultyId ] = useState(searchParams.get('facultyId') || '')
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const handleSearch = (orgId: string) => {
+  const handleSearch = (orgId: string, facultyId: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', '1');
     if (orgId) {
@@ -17,33 +19,65 @@ export default function ChooseSearch({ koulutusohjelmat }: { koulutusohjelmat: K
     } else {
       params.delete('orgId');
     }
+    if (facultyId) {
+      params.set('facultyId', facultyId);
+    } else {
+      params.delete('facultyId');
+    }
     replace(`${pathname}?${params.toString()}`);
   };
 
-  const label = orgId ? 'Valittu koulutusohjelma' : 'Valitse koulutusohjelma';
-
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-2">{label}</h2>
+      <div className='py-2'>
+      <h2 className="text-lg font-semibold mb-2">Valitse tiedekunta</h2>
+      <select
+        className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
+        value={facultyId}
+        onChange={(e) => {
+          setFacultyId(e.target.value);
+          setOrgId('none'); // Set orgId to 'none'
+        }}      
+      >
+        <option value="none">Ei valintaa</option>
+        {tiedekunnat.map((ohjelma) => (
+          <option key={ohjelma.id} value={ohjelma.id}>
+            {ohjelma.name.fi} {ohjelma.id}
+          </option>
+        ))}
+      </select>
+      <br />
+      </div>
+      <div className='py-2'>
+      <h2 className="text-lg font-semibold mb-2">Valitse koulutusohjelma</h2>
       <select
         className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
         value={orgId}
         onChange={(e) => setOrgId(e.target.value)}
       >
-        <option value="">Valitse koulutusohjelma</option>
-        {koulutusohjelmat.map((ohjelma) => (
-          <option key={ohjelma.id} value={ohjelma.id}>
-            {ohjelma.name.fi}
-          </option>
-        ))}
+        <option value="none">Ei valintaa</option>
+        {facultyId === '' || facultyId == 'none' ? (
+          koulutusohjelmat.map((ohjelma) => (
+            <option key={ohjelma.id} value={ohjelma.id}>
+              {ohjelma.name.fi} {ohjelma.id}
+            </option>
+          ))
+        ) : (
+          koulutusohjelmat.filter(k => k.parentId === facultyId).map((ohjelma) => (
+            <option key={ohjelma.id} value={ohjelma.id}>
+              {ohjelma.name.fi} {ohjelma.id}
+            </option>
+          ))
+        )}
       </select>
       <br />
       <button
         className="my-2 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600"
-        onClick={() => handleSearch(orgId)}
+        onClick={() => handleSearch(orgId, facultyId)}
       >
         Hae kurssit
       </button>
+      </div>
     </div>
   );
 }

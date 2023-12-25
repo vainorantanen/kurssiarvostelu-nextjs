@@ -28,7 +28,8 @@ export async function getSchool(schoolId: string) {
     }
 }
 
-export async function getSearchCoursesPages(orgId: string, universityOrgId: string, query: string) {
+export async function getSearchCoursesPages(orgId: string, universityOrgId: string, query: string,
+    orgRootId: string) {
     noStore()
 
     var textQuery = "";
@@ -37,8 +38,20 @@ export async function getSearchCoursesPages(orgId: string, universityOrgId: stri
         textQuery = `fullTextQuery=${query}&`
     }
 
+    // form the org and org root search
+    let organisationsQuery = "";
+    if (orgId != 'none' && orgRootId != 'none') {
+        organisationsQuery = `orgId=${orgId}`
+    } else if (orgId != 'none' && orgRootId == 'none') {
+        organisationsQuery = `orgId=${orgId}`
+    } else if (orgId == 'none' && orgRootId != 'none') {
+        organisationsQuery = `orgRootId=${orgRootId}`
+    } else {
+        return null
+    }
+
     try {
-        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&orgId=${orgId}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&${organisationsQuery}&showMaxResults=false&start=0&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
         const resultData = await res.json()
         //console.log(resultData)
         const totalPages = Math.ceil(Number(resultData.total)/Number(resultData.limit))
@@ -53,7 +66,7 @@ export async function getSearchCoursesPages(orgId: string, universityOrgId: stri
 const itemsPerPage = 10
 
 export async function getSearchCourses(orgId: string, universityOrgId: string,
-    currentPage: number, query: string
+    currentPage: number, query: string, orgRootId: string
     ){
     noStore()
   
@@ -63,9 +76,22 @@ export async function getSearchCourses(orgId: string, universityOrgId: string,
         textQuery = `fullTextQuery=${query}&`
     }
 
+    // form the org and org root search
+    let organisationsQuery = "";
+    if (orgId != 'none' && orgRootId != 'none') {
+        organisationsQuery = `orgId=${orgId}`
+    } else if (orgId != 'none' && orgRootId == 'none') {
+        organisationsQuery = `orgId=${orgId}`
+    } else if (orgId == 'none' && orgRootId != 'none') {
+        organisationsQuery = `orgRootId=${orgRootId}`
+    } else {
+        return null
+    }
+
     try {
-        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&orgId=${orgId}&showMaxResults=false&start=${itemsPerPage*(currentPage-1)}&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&${organisationsQuery}&showMaxResults=false&start=${itemsPerPage*(currentPage-1)}&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
         const resultData = await res.json()
+        //console.log(resultData)
         return resultData.searchResults as Course[]
     } catch (error) {
         console.error('getSearchCourses error: ', error);
@@ -88,6 +114,23 @@ export async function getKoulutusOhjelmat(schoolId: string) {
     } catch (error) {
         console.error('getkoulutusOhjelmat error: ', error);
         throw new Error('Failed to fetch koulutusohjelmat');
+    }
+  }
+
+  export async function getTiedekunnat(schoolId: string) {
+    noStore()
+    try {
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/`)
+    // käytetään koulutusohjelman tyyppiä koska se on sama kuin tiedekunnalla
+        const data = await res.json() as Koulutusohjelma[]
+    
+    const tiedeKunnat = data
+    .filter(d => d.universityOrgId === schoolId && d.parentId !== null && d.parentId === schoolId)
+    .sort((a, b) => a.name.fi.localeCompare(b.name.fi));
+    return tiedeKunnat
+    } catch (error) {
+        console.error('tiedeKunnat error: ', error);
+        throw new Error('Failed to fetch tiedeKunnat');
     }
   }
 

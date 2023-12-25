@@ -1,4 +1,4 @@
-import { getKoulutusOhjelmat, getReviewData, getSchool, getSearchCoursesPages } from "@/app/lib/data";
+import { getKoulutusOhjelmat, getReviewData, getSchool, getSearchCoursesPages, getTiedekunnat } from "@/app/lib/data";
 import ChooseSearch from "@/app/ui/schools/courses/ChooseSearch";
 import TextSearch from "@/app/ui/schools/courses/TextSearch";
 import CoursesList from "@/app/ui/schools/courses/courseslist";
@@ -15,15 +15,18 @@ export default async function SingleschoolPage({ params,
     orgId?: string;
     page?: string;
     query?: string;
+    facultyId?: string;
   }}) {
   const school = await getSchool(params.schoolId)
 
   const currentPage = Number(searchParams?.page) || 1;
 
   const koulutusohjelmat = await getKoulutusOhjelmat(params.schoolId)
-  const orgId = searchParams?.orgId || koulutusohjelmat[0].id || 'Valitse koulutusohjelma';
+  const tiedekunnat = await getTiedekunnat(params.schoolId)
+  const orgId = searchParams?.orgId || 'none';
   const query = searchParams?.query || ''
-  const totalPages = await getSearchCoursesPages(orgId, school.id, query);
+  const orgRootId = searchParams?.facultyId || 'none'
+  const totalPages = await getSearchCoursesPages(orgId, school.id, query, orgRootId);
 
   if (!school) {
     return (
@@ -36,8 +39,6 @@ export default async function SingleschoolPage({ params,
       </div>
     );
   }
-
-  console.log('passing orgid: ', orgId)
 
   return (
     <div className="min-h-screen">
@@ -54,17 +55,19 @@ export default async function SingleschoolPage({ params,
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <div className="md:col-span-1">
   <div className="py-4">
-    <ChooseSearch koulutusohjelmat={koulutusohjelmat}/>
+    <ChooseSearch koulutusohjelmat={koulutusohjelmat} tiedekunnat={tiedekunnat}/>
     </div>
   </div>
   <div className="md:col-span-2">
   <div className="grid grid-cols-1 gap-4">
     <h1 className="text-2xl text-center font-bold">{koulutusohjelmat.find(k => k.id == orgId)?.name.fi}</h1>
     <TextSearch placeholder="Hae kurssia..."/>
-    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage} query={query}/>
-    <div className="mt-5 flex w-full justify-center text-center">
+    <CoursesList orgId={orgId} universityOrgId={school.id} currentPage={currentPage} query={query} orgRootId={orgRootId}/>
+    {totalPages != null && totalPages > 1 && (
+      <div className="mt-5 flex w-full justify-center text-center">
       <Pagination totalPages={totalPages} />
    </div>
+    )}
     </div>
     </div>
   </div>
