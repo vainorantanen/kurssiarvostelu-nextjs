@@ -42,7 +42,7 @@ export default function ChooseSearch({ koulutusohjelmat, tiedekunnat }: { koulut
         <option value="none">Ei valintaa</option>
         {tiedekunnat.map((ohjelma) => (
           <option key={ohjelma.id} value={ohjelma.id}>
-            {ohjelma.name.fi} {ohjelma.id}
+            {ohjelma.name.fi}
           </option>
         ))}
       </select>
@@ -65,7 +65,7 @@ export default function ChooseSearch({ koulutusohjelmat, tiedekunnat }: { koulut
         ) : (
           koulutusohjelmat.filter(k => k.parentId === facultyId).map((ohjelma) => (
             <option key={ohjelma.id} value={ohjelma.id}>
-              {ohjelma.name.fi} {ohjelma.id}
+              {ohjelma.name.fi}
             </option>
           ))
         )}
