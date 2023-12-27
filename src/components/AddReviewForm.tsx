@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import Loading from "./Loading";
+import Notification from "./Notification";
+import Link from "next/link";
 
 type AddReviewProps = {
   id: string;
   sessionIsNull: boolean;
+  schoolId: string;
   addReview: (
     description: string,
     rating: number,
@@ -17,10 +20,11 @@ type AddReviewProps = {
     expectations: number,
     materials: number,
     benefit: number,
+    schoolId: string
   ) => void;
 };
 
-export default function AddReviewForm({ id, addReview, sessionIsNull }: AddReviewProps) {
+export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }: AddReviewProps) {
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState(0);
   const [benefit, setBenefit] = useState(0);
@@ -32,20 +36,21 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
   const [ captcha, setCaptcha ] = useState<string | null>()
   const [error, setError] = useState("");
   const [ loading, setLoading ] = useState<boolean>(false)
-
   const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
+  const [ showNotification, setShowNotification ] = useState<boolean>(false)
 
   const handleTermsCheckbox = () => {
     setAcceptedTerms(!acceptedTerms);
   };
 
   const handleAddReview = () => {
-
+    
     if (!captcha && sessionIsNull) {
       setError("Todista, ettet ole robotti");
       return
     }
     // Check if grade is a number and between 1 and 5
+    setLoading(true)
     if (
       // joko sessio ei ole null eli käyttäjä on kirjautunut sisään => ei tarvii enää accept terms
       // tai sitten käyttöehdot on hyväksytty
@@ -56,17 +61,31 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
       grade >= 1 &&
       grade <= 5
     ) {
-      addReview(description, rating, Number(grade), year, workload, id, expectation, materials, benefit );
+      addReview(description, rating, Number(grade), year, workload, id, expectation, materials, benefit,
+      schoolId );
       setDescription("");
       setRating(0);
-      setGrade(5); // Reset grade to an empty string
-      setYear("1. vuonna"); // Reset year to the initial value
+      setGrade(5);
+      setExpectation(0)
+      setMaterials(0)
+      setBenefit(0)
+      setWorkload(1)
+      setYear("1. vuonna"); 
+      notify()
     }
+    setLoading(false)
   };
 
   const handleStarClick = (star: number, setStar: (value: number) => void) => {
     setStar(star);
   };
+
+  const notify = () => {
+    setShowNotification(true)
+    setTimeout(() => {
+      setShowNotification(false)
+    }, 10000)
+  }
 
   return (
     <div className="p-4 max-w-xl mx-auto rounded shadow-lg bg-white">
@@ -234,6 +253,12 @@ export default function AddReviewForm({ id, addReview, sessionIsNull }: AddRevie
           {loading && (
           <Loading />
         )}
+
+
+      {showNotification && (
+          <Notification message="Arvostelu lisätty onnistuneesti" type="success" />
+      )}
+
     </div>
   );
 }
