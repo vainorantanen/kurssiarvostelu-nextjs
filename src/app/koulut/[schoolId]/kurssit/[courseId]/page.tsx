@@ -5,12 +5,14 @@ import prisma from "@/db";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FaStar, FaCheckCircle } from 'react-icons/fa';
+import { FaStar, FaCheckCircle, FaThumbsUp } from 'react-icons/fa';
 import { Review, User } from "@prisma/client";
 import { formatDistanceToNow } from 'date-fns';
 import dayjs from "dayjs";
 import BackButton from "@/app/ui/schools/courses/BackButton";
-import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
+import { getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
+import UpvoteButton from "@/components/UpvoteButton";
+import { deleteReview, upvoteReview } from "@/app/lib/actions";
 
 
   export default async function SingleCoursePage({ params }: any) {
@@ -161,6 +163,10 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
                         <p className="text-xl">{(review.rating + review.expectations + review.benefit
                         + review.materials)/4}</p>
                         </div>
+                        <div className="py-3 gap-2 flex items-center">
+                          <FaThumbsUp />
+                          <p>{review.likesCount}</p>
+                          </div>
                         </div>
                         <div>
                          <p className="text-xs text-black mb-2">{dayjs(review.createdAt).format('DD.MM.YYYY')}</p>
@@ -234,10 +240,17 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
   </tbody>
 </table>
                         </div>
-                      {userFromDb && (userFromDb.email === process.env.ADMIN
+                      
+                
+                <div className="flex flex-row gap-2">
+                {userFromDb && (userFromDb.email === process.env.ADMIN
                       || userFromDb.id === review.userId) && (
                         <DeleteReviewButton id={review.id} deleteReview={deleteReview}/>
                       )}
+                      {userFromDb && (
+                        <UpvoteButton schoolId={params.schoolId} reviewId={review.id} upvoteReview={upvoteReview}/>
+                      )}
+                  </div>
                     </div>
                     </div>
                   ))
