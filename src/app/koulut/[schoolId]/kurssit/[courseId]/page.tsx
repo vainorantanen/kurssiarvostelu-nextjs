@@ -19,6 +19,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
     const course = await getCourse(params.courseId);
     const reviewsOfCourse = await getReviewsByCourse(params.courseId);
     const session = await getServerSession(authOptions)
+    const sessionIsNull = session == null
 
     if (!course) {
       return (
@@ -172,6 +173,8 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
                           <FaThumbsUp />
                           <p>{review.likesCount}</p>
                           </div>
+                          <UpvoteButton schoolId={params.schoolId} reviewId={review.id} upvoteReview={upvoteReview}
+                        sessionIsNull={sessionIsNull}/>
                         </div>
                         <div>
                          <p className="text-xs text-black mb-2">{dayjs(review.createdAt).format('DD.MM.YYYY')}</p>
@@ -250,11 +253,10 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
                 <div className="flex flex-row gap-2">
                 {userFromDb && (userFromDb.email === process.env.ADMIN
                       || userFromDb.id === review.userId) && (
-                        <DeleteReviewButton id={review.id} deleteReview={deleteReview}/>
+                        <DeleteReviewButton id={review.id} deleteReview={deleteReview}
+                        schoolId={params.schoolId}/>
                       )}
-                      {userFromDb && (
-                        <UpvoteButton schoolId={params.schoolId} reviewId={review.id} upvoteReview={upvoteReview}/>
-                      )}
+                      
                   </div>
                     </div>
                     </div>
