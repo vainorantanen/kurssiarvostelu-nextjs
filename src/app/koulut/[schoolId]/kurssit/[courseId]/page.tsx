@@ -5,12 +5,14 @@ import prisma from "@/db";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FaStar, FaCheckCircle } from 'react-icons/fa';
+import { FaStar, FaCheckCircle, FaThumbsUp } from 'react-icons/fa';
 import { Review, User } from "@prisma/client";
 import { formatDistanceToNow } from 'date-fns';
 import dayjs from "dayjs";
 import BackButton from "@/app/ui/schools/courses/BackButton";
-import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
+import { getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
+import UpvoteButton from "@/components/UpvoteButton";
+import { deleteReview, upvoteReview } from "@/app/lib/actions";
 
 
   export default async function SingleCoursePage({ params }: any) {
@@ -77,9 +79,14 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
             <BackButton />
   <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi || course.name.en}, {course.code}</h1>
   <p className="mb-2 text-xl">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
+  <div className="flex flex-row flex-wrap gap-2">
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/koulut/${params.schoolId}/kurssit/${params.courseId}/lisaa-arvostelu/`}>Arvostele tämä kurssi</Link>
   </button>
+  <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+    <Link href={`/koulut/${params.schoolId}/kurssit/${params.courseId}/analytiikka/`}>Analytiikka</Link>
+  </button>
+  </div>
         
               <h2 className="text-2xl font-bold text-white mt-4 mb-2">Yhteenveto</h2>
               {averageRating > 0 ? (
@@ -116,7 +123,7 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
             style={{ width: barWidth, backgroundColor: 'blue', borderRadius: '0.2rem' }}
           ></div>
         </div>
-        <div className="w-1/4 pl-2 text-right">{gradeCount} kpl</div>
+        <div className="w-1/4 pl-2 text-left">{gradeCount} kpl</div>
       </div>
     );
   })}
@@ -137,7 +144,7 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
             style={{ width: barWidth, backgroundColor: 'blue', borderRadius: '0.2rem' }}
           ></div>
         </div>
-        <div className="w-1/4 pl-2 text-right">{yearCount} kpl</div>
+        <div className="w-1/4 pl-2 text-left">{yearCount} kpl</div>
       </div>
     );
   })}
@@ -161,6 +168,10 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
                         <p className="text-xl">{(review.rating + review.expectations + review.benefit
                         + review.materials)/4}</p>
                         </div>
+                        <div className="py-3 gap-2 flex items-center">
+                          <FaThumbsUp />
+                          <p>{review.likesCount}</p>
+                          </div>
                         </div>
                         <div>
                          <p className="text-xs text-black mb-2">{dayjs(review.createdAt).format('DD.MM.YYYY')}</p>
@@ -234,10 +245,17 @@ import { deleteReview, getCourse, getReviewsByCourse, getUser } from "@/app/lib/
   </tbody>
 </table>
                         </div>
-                      {userFromDb && (userFromDb.email === process.env.ADMIN
+                      
+                
+                <div className="flex flex-row gap-2">
+                {userFromDb && (userFromDb.email === process.env.ADMIN
                       || userFromDb.id === review.userId) && (
                         <DeleteReviewButton id={review.id} deleteReview={deleteReview}/>
                       )}
+                      {userFromDb && (
+                        <UpvoteButton schoolId={params.schoolId} reviewId={review.id} upvoteReview={upvoteReview}/>
+                      )}
+                  </div>
                     </div>
                     </div>
                   ))

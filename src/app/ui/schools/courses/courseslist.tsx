@@ -20,10 +20,11 @@ export default async function CoursesList({
 
     const courses = await getSearchCourses(orgId, universityOrgId, currentPage, query, orgRootId)
 
-    if (!courses) {
+    if (!courses || courses.length == 0) {
         return (
-          <div>
-            <h2 className="text-xl font-bold text-center py-4">Lisää rajaustekijöitä</h2>
+          <div className="bg-white rounded text-black py-4 text-center">
+            <h2 className="font-bold text-xl">Lisää rajaustekijöitä</h2>
+            <p className="py-2">Valitse tiedekunta ja/tai koulutusohjelma, minkä jälkeen voit hakea kurssia hakusanallakin.</p>
           </div>
         )
     }
