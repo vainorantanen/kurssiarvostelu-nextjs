@@ -79,9 +79,14 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
             <BackButton />
   <h1 className="text-3xl font-bold my-4 text-white">{course.name.fi || course.name.en}, {course.code}</h1>
   <p className="mb-2 text-xl">({course.credits.min === course.credits.max ? course.credits.min: `${course.credits.min} - ${course.credits.max}`}op)</p>
+  <div className="flex flex-row flex-wrap gap-2">
   <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href={`/koulut/${params.schoolId}/kurssit/${params.courseId}/lisaa-arvostelu/`}>Arvostele tämä kurssi</Link>
   </button>
+  <button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+    <Link href={`/koulut/${params.schoolId}/kurssit/${params.courseId}/analytiikka/`}>Analytiikka</Link>
+  </button>
+  </div>
         
               <h2 className="text-2xl font-bold text-white mt-4 mb-2">Yhteenveto</h2>
               {averageRating > 0 ? (
@@ -118,7 +123,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
             style={{ width: barWidth, backgroundColor: 'blue', borderRadius: '0.2rem' }}
           ></div>
         </div>
-        <div className="w-1/4 pl-2 text-right">{gradeCount} kpl</div>
+        <div className="w-1/4 pl-2 text-left">{gradeCount} kpl</div>
       </div>
     );
   })}
@@ -139,7 +144,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
             style={{ width: barWidth, backgroundColor: 'blue', borderRadius: '0.2rem' }}
           ></div>
         </div>
-        <div className="w-1/4 pl-2 text-right">{yearCount} kpl</div>
+        <div className="w-1/4 pl-2 text-left">{yearCount} kpl</div>
       </div>
     );
   })}
