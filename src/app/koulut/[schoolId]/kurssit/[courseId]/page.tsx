@@ -50,6 +50,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
           '2': 0,          
           '1': 0,
           '0': 0,
+          'En halua kertoa': 0
         };
 
         reviewsOfCourse.forEach((review) => {
@@ -64,6 +65,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
           '3. vuonna': 0,
           '2. vuonna': 0,          
           '1. vuonna': 0,
+          'En halua kertoa': 0
         };
 
         reviewsOfCourse.forEach((review) => {

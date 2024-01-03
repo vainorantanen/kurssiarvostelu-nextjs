@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "../api/auth/[...nextauth]/options"
 import { revalidatePath } from "next/cache"
 import { getUser } from "./data"
+import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types"
 
 const emailEndings = [
     "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
@@ -13,20 +14,26 @@ const emailEndings = [
   ]
   
 export async function addReview(description: string,
-    rating: number, grade: number, year: string, workload: number,
+    rating: number, grade: UserGrade, year: UserYear, workload: Workload,
     courseSisuId: string, expectations: number,
     materials: number,
-    benefit: number, schoolId: string) {
+    benefit: number, schoolId: string,
+    difficulty: number, interest: number,
+    tips: string, gradingCriteria: GradingCriteria[],
+    deliveryMethod: DeliveryMethod) {
   
+  try {
     const session = await getServerSession(authOptions)
   
     if (typeof description !== "string" || description.length === 0
-    || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number'
-    || !year || typeof year !== 'string' || !workload || typeof workload !== 'number'
+    || !rating || typeof rating !== 'number' || !grade
+    || !year || !workload || !gradingCriteria || !deliveryMethod
     || !courseSisuId || typeof courseSisuId !== 'string' || courseSisuId.length === 0
     || !expectations || typeof expectations !== 'number' || !materials
-    || typeof materials !== 'number' || !benefit || typeof benefit !== 'number') {
-        throw new Error("Invalid inputs")
+    || typeof materials !== 'number' || !benefit || typeof benefit !== 'number'
+    || !interest || typeof interest !== 'number'
+    || !difficulty || typeof difficulty !== 'number') {
+        throw new Error("Tarkista syötteesi")
       }
   
     if (session && session.user && session.user.email) {
@@ -45,6 +52,11 @@ export async function addReview(description: string,
         expectations,
         materials,
         benefit,
+        difficulty,
+        interest,
+        tips,
+        gradingCriteria,
+        deliveryMethod,
         writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
       user: {
         connect: {
@@ -68,13 +80,20 @@ export async function addReview(description: string,
         expectations,
         materials,
         benefit,
+        difficulty,
+        interest,
+        tips,
+        gradingCriteria,
+        deliveryMethod,
         writerIsVerified: false
     } })
       //redirect('/kiitos-arvostelusta')
       revalidatePath(`/koulut/${schoolId}/kurssit/${courseSisuId}`)
 
     }
-   
+  } catch(error) {
+    return (<Error>error).message;
+  }   
   }
 
   export async function upvoteReview(schoolId: string, reviewId: string) {

@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
-import Loading from "./Loading";
 import Notification from "./Notification";
 import Link from "next/link";
+import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types";
+import Select, { ActionMeta, MultiValue } from 'react-select';
 
 type AddReviewProps = {
   id: string;
@@ -13,16 +14,26 @@ type AddReviewProps = {
   addReview: (
     description: string,
     rating: number,
-    grade: number,
-    year: string,
-    workload: number,
+    grade: UserGrade,
+    year: UserYear,
+    workload: Workload,
     courseSisuId: string,
     expectations: number,
     materials: number,
     benefit: number,
-    schoolId: string
+    schoolId: string,
+    difficulty: number,
+    interest: number,
+    tips: string,
+    gradingCriteria: GradingCriteria[],
+    deliveryMethod: DeliveryMethod,
   ) => void;
 };
+
+type SelectedOptionsType = {
+  value: GradingCriteria;
+  label: string
+}
 
 export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }: AddReviewProps) {
   const [description, setDescription] = useState("");
@@ -30,14 +41,18 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
   const [benefit, setBenefit] = useState(0);
   const [expectation, setExpectation] = useState(0);
   const [materials, setMaterials] = useState(0);
-  const [grade, setGrade] = useState(5); // Initialize grade as an empty string
-  const [year, setYear] = useState("1. vuonna"); // Initial year value
-  const [ workload, setWorkload ] = useState(1)
+  const [grade, setGrade] = useState<UserGrade>(UserGrade.Five); // Initialize grade as an empty string
+  const [year, setYear] = useState<UserYear>(UserYear.VUONNA_1); // Initial year value
+  const [ workload, setWorkload ] = useState<Workload>(Workload.Sopiva);
   const [ captcha, setCaptcha ] = useState<string | null>()
   const [error, setError] = useState("");
-  const [ loading, setLoading ] = useState<boolean>(false)
   const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
   const [ showNotification, setShowNotification ] = useState<boolean>(false)
+  const [ difficulty, setDifficulty ] = useState(0)
+  const [ interest, setInterest ] = useState(0)
+  const [ tips, setTips ] = useState<string>('')
+  const [ gradingCriteria, setGradingCriteria ] = useState<GradingCriteria[]>([])
+  const [ deliveryMethod, setDeliveryMethod ] = useState<DeliveryMethod>(DeliveryMethod.EiValintaa)
 
   const handleTermsCheckbox = () => {
     setAcceptedTerms(!acceptedTerms);
@@ -49,36 +64,72 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       setError("Todista, ettet ole robotti");
       return
     }
-    // Check if grade is a number and between 1 and 5
-    setLoading(true)
+
+    if (!acceptedTerms) {
+      setError("Sinun tulee hyväkysä käyttöehdot")
+      return
+    }
+
     if (
       // joko sessio ei ole null eli käyttäjä on kirjautunut sisään => ei tarvii enää accept terms
       // tai sitten käyttöehdot on hyväksytty
       (!sessionIsNull || acceptedTerms) &&
       description.trim() !== "" &&
-      rating > 0 &&
-      !isNaN(Number(grade)) &&
-      grade >= 1 &&
-      grade <= 5
+      rating > 0
+      && expectation > 0
+      && materials > 0
+      && benefit > 0
+      && difficulty > 0 && interest > 0 && gradingCriteria != null
+      && deliveryMethod != null
+      && year != null
+      && grade != null
+      && workload != null
     ) {
-      addReview(description, rating, Number(grade), year, workload, id, expectation, materials, benefit,
-      schoolId );
+      addReview(description, rating, grade, year, workload, id, expectation, materials, benefit,
+      schoolId, difficulty, interest, tips, gradingCriteria,
+      deliveryMethod );
       setDescription("");
       setRating(0);
-      setGrade(5);
       setExpectation(0)
       setMaterials(0)
-      setBenefit(0)
-      setWorkload(1)
-      setYear("1. vuonna"); 
+      setBenefit(0) 
       notify()
+    } else {
+      setError("Tarkista syöttämäsi arvot")
+      return
     }
-    setLoading(false)
   };
 
   const handleStarClick = (star: number, setStar: (value: number) => void) => {
     setStar(star);
   };
+
+  const handleWorkloadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setWorkload(e.target.value as Workload);
+  };
+
+  const handleUserGradeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setGrade(e.target.value as UserGrade);
+  };
+
+  const handleUserYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setYear(e.target.value as UserYear);
+  };
+
+  const handleCriteriaChange = (newValue: MultiValue<{ value: GradingCriteria; label: GradingCriteria; }>,
+    actionMeta: ActionMeta<{ value: GradingCriteria; label: GradingCriteria; }>) => {
+    const listOfVals = newValue.map(n => n.value) as GradingCriteria[]
+    setGradingCriteria(listOfVals)
+  };
+
+  const handleDeliveryMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setDeliveryMethod(e.target.value as DeliveryMethod);
+  };
+
+  const criteriaOptions = Object.values(GradingCriteria).map((value) => ({
+    value,
+    label: value,
+  }));
 
   const notify = () => {
     setShowNotification(true)
@@ -92,9 +143,18 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       <textarea
         name="description"
         className="w-full h-40 px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
-        placeholder="Kirjoita avoin arvostelu tähän"
+        placeholder="Kirjoita avoin arvostelu tähän*"
         value={description}
+        required
         onChange={(e) => setDescription(e.target.value)}
+      />
+
+<textarea
+        name="tips"
+        className="w-full h-40 px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
+        placeholder="Anna vinkkejä kurssiin (valinnainen)"
+        value={tips}
+        onChange={(e) => setTips(e.target.value)}
       />
 
 <div className="my-4 flex flex-col jusitfy-center items-center">
@@ -132,7 +192,7 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Kurssilla käytettyjen materiaalien (luentokalvot, kirjat tms.) laatu</p>
+        <p className="text-black">Kurssilla käytettyjen materiaalien laatu</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -149,7 +209,41 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Kurssista on hyötyä muissa opinnoissa tai työelämässä</p>
+        <p className="text-black">Helppous (1 = Todella vaikea, 5 = Todella helppo)</p>
+        <div className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`cursor-pointer text-3xl ${
+                star <= difficulty ? "text-yellow-500" : "text-gray-400"
+              }`}
+              onClick={() => handleStarClick(star, setDifficulty)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Kiinnostavuus</p>
+        <div className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`cursor-pointer text-3xl ${
+                star <= interest ? "text-yellow-500" : "text-gray-400"
+              }`}
+              onClick={() => handleStarClick(star, setInterest)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Kurssin hyödyllisyys</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -166,49 +260,79 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4">
-        <p className="text-black">Arvioi kurssin työmäärää suhteessa opintopisteisiin</p>
-        <p className="text-black mb-1">(1 = vähän, 3 = sopiva, 5 = liikaa)</p>
-        <input
-          type="number"
-          id="workload"
-          name="workload"
-          min="1"
-          max="5"
-          value={workload}
-          onChange={(e) => setWorkload(Number(e.target.value))}
-          className="w-16 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
-        />
+        <p className="text-black">Työmäärä suhteessa opintopisteisiin</p>
+        <select
+        id="workload"
+        name="workload"
+        value={workload}
+        onChange={handleWorkloadChange}
+        className="w-32 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
+      >
+        {Object.values(Workload).map((value) => (
+          <option key={value} value={value}>
+            {value}
+          </option>
+        ))}
+      </select>
       </div>
 
       <div className="my-4">
         <p className="text-black">Minkä arvosanan sait kurssilta (1-5)?</p>
-        <input
-          type="number"
+        <select
           id="grade"
           name="grade"
-          min="1"
-          max="5"
           value={grade}
-          onChange={(e) => setGrade(Number(e.target.value))}
-          className="w-16 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
-        />
+          onChange={handleUserGradeChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
+        >
+          {Object.values(UserGrade).map((value) => (
+          <option key={value} value={value}>
+            {value}
+          </option>
+        ))}
+        </select>
       </div>
 
       <div className="my-4">
         <p className="text-black">Missä vaiheessa opintoja suoritit kurssin?</p>
         <select
           value={year}
-          onChange={(e) => setYear(e.target.value)}
+          onChange={handleUserYearChange}
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
         >
-          <option value="1. vuonna">1. vuonna</option>
-          <option value="2. vuonna">2. vuonna</option>
-          <option value="3. vuonna">3. vuonna</option>
-          <option value="4. vuonna">4. vuonna</option>
-          <option value="5. vuonna">5. vuonna</option>
-          <option value="6. vuonna">6. vuonna</option>
-          <option value="N. vuonna">N. vuonna</option>
+          {Object.values(UserYear).map((value) => (
+          <option key={value} value={value}>
+            {value}
+          </option>
+        ))}
         </select>
+      </div>
+
+      <div className="my-4">
+        <p className="text-black">Opetusmuoto</p>
+        <select
+        id="deliverymethod"
+        name="deliverymethod"
+        value={deliveryMethod}
+        onChange={handleDeliveryMethodChange}
+        className="w-32 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
+      >
+        {Object.values(DeliveryMethod).map((value) => (
+          <option key={value} value={value}>
+            {value}
+          </option>
+        ))}
+      </select>
+      </div>
+
+      <div className="my-4 text-black">
+        <p className="text-black">Kurssin arvostelukriteerit</p>
+        <Select
+        placeholder="Valitse..."
+        isMulti
+        options={criteriaOptions}
+        onChange={handleCriteriaChange}
+      />
       </div>
 
       <div className="my-4 flex items-center">
@@ -250,9 +374,6 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
               {error}
             </div>
           )}
-          {loading && (
-          <Loading />
-        )}
 
 
       {showNotification && (
