@@ -31,6 +31,7 @@ export default async function SingleCourseAnalyticsPage({ params }: any) {
     '2': 0,
     '1': 0,
     '0': 0,
+    'En halua kertoa': 0
   };
 
   reviewsOfCourse.forEach((review) => {
@@ -57,6 +58,7 @@ export default async function SingleCourseAnalyticsPage({ params }: any) {
     '3. vuonna': 0,
     '2. vuonna': 0,          
     '1. vuonna': 0,
+    'En halua kertoa': 0
   };
 
   reviewsOfCourse.forEach((review) => {
@@ -66,11 +68,11 @@ export default async function SingleCourseAnalyticsPage({ params }: any) {
    })
 
    const workloadCounts: Record<string, number> = {
-    '5': 0,
-    '4': 0,
-    '3': 0,
-    '2': 0,
-    '1': 0,
+    'Todella kevyt': 0,
+    'Kevyt': 0,
+    'Sopiva': 0,
+    'Suuri': 0,
+    'Liian suuri': 0,
   };
 
   reviewsOfCourse.forEach((review) => {

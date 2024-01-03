@@ -6,6 +6,7 @@ import { Review } from "@prisma/client";
 import { FaStar } from "react-icons/fa";
 import notebookImage from '@/Assets/book.png'
 import Image from 'next/image';
+import { Course, Koulutusohjelma } from "@/utils/types";
 
 type CourseSearchProps = {
     //initialCourses: Course[]

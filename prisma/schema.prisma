@@ -14,11 +14,16 @@ model Review {
   id       String    @id @default(auto()) @map("_id") @db.ObjectId
   description    String
   rating          Int
-  grade           Int
-  workload    Int
+  grade           String
+  workload    String
   expectations Int
   materials Int
   benefit Int
+  difficulty Int
+  interest Int
+  tips String?
+  gradingCriteria String[]
+  deliveryMethod String
   writerIsVerified  Boolean @default(false)
   isVisible Boolean @default(true)
   year        String

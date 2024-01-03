@@ -3,16 +3,7 @@ import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import AddCourseForm from "@/components/AddCourseForm"
 import { authOptions } from "@/app/api/auth/[...nextauth]/options"
-
-async function getSchool(schoolId: string) {
-  "use server"
-
-  const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/organisations/${schoolId}`)
-  const data = await res.json() as School
-  
-  return data
-  
-}
+import { getSchool } from "@/app/lib/data"
 
 async function addCourse(name: string, schoolName: string, code: string,
  credits: string ) {

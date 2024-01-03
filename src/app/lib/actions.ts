@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "../api/auth/[...nextauth]/options"
 import { revalidatePath } from "next/cache"
 import { getUser } from "./data"
+import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types"
 
 const emailEndings = [
     "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
@@ -13,20 +14,26 @@ const emailEndings = [
   ]
   
 export async function addReview(description: string,
-    rating: number, grade: number, year: string, workload: number,
+    rating: number, grade: UserGrade, year: UserYear, workload: Workload,
     courseSisuId: string, expectations: number,
     materials: number,
-    benefit: number, schoolId: string) {
+    benefit: number, schoolId: string,
+    difficulty: number, interest: number,
+    tips: string, gradingCriteria: GradingCriteria[],
+    deliveryMethod: DeliveryMethod) {
   
+  try {
     const session = await getServerSession(authOptions)
   
     if (typeof description !== "string" || description.length === 0
-    || !rating || typeof rating !== 'number' || !grade || typeof grade !== 'number'
-    || !year || typeof year !== 'string' || !workload || typeof workload !== 'number'
+    || !rating || typeof rating !== 'number' || !grade
+    || !year || !workload || !gradingCriteria || !deliveryMethod
     || !courseSisuId || typeof courseSisuId !== 'string' || courseSisuId.length === 0
     || !expectations || typeof expectations !== 'number' || !materials
-    || typeof materials !== 'number' || !benefit || typeof benefit !== 'number') {
-        throw new Error("Invalid inputs")
+    || typeof materials !== 'number' || !benefit || typeof benefit !== 'number'
+    || !interest || typeof interest !== 'number'
+    || !difficulty || typeof difficulty !== 'number') {
+        throw new Error("Tarkista syötteesi")
       }
   
     if (session && session.user && session.user.email) {
@@ -45,6 +52,11 @@ export async function addReview(description: string,
         expectations,
         materials,
         benefit,
+        difficulty,
+        interest,
+        tips,
+        gradingCriteria,
+        deliveryMethod,
         writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
       user: {
         connect: {
@@ -68,76 +80,76 @@ export async function addReview(description: string,
         expectations,
         materials,
         benefit,
+        difficulty,
+        interest,
+        tips,
+        gradingCriteria,
+        deliveryMethod,
         writerIsVerified: false
     } })
       //redirect('/kiitos-arvostelusta')
       revalidatePath(`/koulut/${schoolId}/kurssit/${courseSisuId}`)
 
     }
-   
+  } catch(error) {
+    return (<Error>error).message;
+  }   
   }
 
-export async function upvoteReview(schoolId:string, reviewId: string) {
-    console.log('upvoted')
-
-    const session = await getServerSession(authOptions)
-
-    const rev = await prisma.review.findUnique({ where: {id: reviewId} })
-    if (!rev) {
-      throw new Error("Arvostelua ei löytynyt")
-    }
-
-    if (!session || !session.user || !session.user.email) {
-      throw new Error("Sessionia ei ole")
-    }
-
-    const userFromDb = await getUser(session.user.email)
-
-    if (!userFromDb) {
-      throw new Error("Käyttäjää ei löytynyt")
-    }
-
-    // get posts liked by the user and check if the user has already liked the post
-    const postsLikedByUser = await prisma.reviewLike.findMany({ where : { userId: userFromDb.id } })
-
-    // try to find if the user has liked the current post
-    const hasLiked = postsLikedByUser.find(p => p.reviewId == reviewId)
-
-    if (hasLiked) {
-      throw new Error("User has already liked this post")
-    }
-
+  export async function upvoteReview(schoolId: string, reviewId: string) {
     try {
-      await prisma.reviewLike.create({ data: {
-        review: {
-          connect: {
-            id: reviewId
-          }
-        },
-        user: {
-          connect: {
-            email: session.user.email
-          }
+      const session = await getServerSession(authOptions);
+      const rev = await prisma.review.findUnique({ where: { id: reviewId } });
+  
+      if (!rev) {
+        throw new Error("Virhe: Arvostelua ei enää ole");
       }
-    }})
-
-    const currentLikes = rev.likesCount;
-    const updatedLikes = currentLikes + 1; // Increment the likes count
-
-    // Update the review with the incremented likes count
-    await prisma.review.update({
-      where: { id: reviewId },
-      data: { likesCount: updatedLikes },
-    });
-
+  
+      if (!session || !session.user || !session.user.email) {
+        throw new Error("Virhe: Kirjaudu sisään tykätäksesi");
+      }
+  
+      const userFromDb = await getUser(session.user.email);
+  
+      if (!userFromDb) {
+        throw new Error("Virhe: Käyttäjää ei ole");
+      }
+  
+      const postsLikedByUser = await prisma.reviewLike.findMany({ where: { userId: userFromDb.id } });
+      const hasLiked = postsLikedByUser.find((p) => p.reviewId == reviewId);
+  
+      if (hasLiked) {
+        throw new Error("Virhe: Olet jo tykännyt tästä");
+      }
+  
+      await prisma.reviewLike.create({
+        data: {
+          review: {
+            connect: { id: reviewId },
+          },
+          user: {
+            connect: { email: session.user.email },
+          },
+        },
+      });
+  
+      const currentLikes = rev.likesCount;
+      const updatedLikes = currentLikes + 1;
+  
+      await prisma.review.update({
+        where: { id: reviewId },
+        data: { likesCount: updatedLikes },
+      });
+  
+      revalidatePath(`/koulut/${schoolId}/kurssit/${reviewId}`);
+      return null; // No error occurred
     } catch (error) {
-      throw new Error("Error liking post")
+      return (<Error>error).message;
     }
+  }
+  
 
-    revalidatePath(`/koulut/${schoolId}/kurssit/${reviewId}`)
-}
-
-export async function deleteReview(id: string) {
+export async function deleteReview(id: string, schoolId:string) {
   
     const session = await getServerSession(authOptions)
 
@@ -160,7 +172,8 @@ export async function deleteReview(id: string) {
       throw new Error("Vain admin tai arvostelun lisännyt voi poistaa arvostelun")
     }
 
+    await prisma.reviewLike.deleteMany({ where: { reviewId: id }})
     await prisma.review.delete({ where: { id } });
 
-    redirect('/poistettu-onnistuneesti')
+    revalidatePath(`/koulut/${schoolId}/kurssit/${id}`)
   }
