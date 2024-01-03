@@ -5,6 +5,7 @@ import { getServerSession } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { redirect } from 'next/navigation';
+import { Course, Koulutusohjelma, School, SingleCourse } from '@/utils/types';
 
 export async function getCourse(courseId: string) {
     noStore()

@@ -1,5 +1,6 @@
 "use client"
 
+import { Koulutusohjelma } from '@/utils/types';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

@@ -19,7 +19,7 @@ export default async function Home() {
 
   console.log("session at Home", session)
 
-  const schools: School[] = await getSchools()
+  const schools = await getSchools()
 
   return (
     <div className="flex flex-col items-center space-y-4">

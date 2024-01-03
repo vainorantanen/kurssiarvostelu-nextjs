@@ -1,4 +1,4 @@
-type Course = {
+export type Course = {
     id: string;
     name: string;
     code: string
@@ -10,12 +10,12 @@ type Course = {
     activityPeriods: any[]; // Replace 'any' with the appropriate type
   };
   
-  type Credits = {
+ export type Credits = {
     min: number;
     max: number;
   };
 
-  type SingleCourse = {
+export  type SingleCourse = {
     id: string;
     name: SingleCourseName;
     code: string
@@ -24,19 +24,19 @@ type Course = {
     universityOrgIds: string[];
   }
 
-  type SingleCourseName = {
+export  type SingleCourseName = {
     en: string;
     fi: string;
   }
 
-  type School = {
+export  type School = {
     id: string;
     name: SchoolName;
     parentId: string | null;
     code: string;
   };
 
-  type Koulutusohjelma = {
+export  type Koulutusohjelma = {
     id: string;
     parentId: string;
     name: SchoolName;
@@ -44,7 +44,7 @@ type Course = {
     universityOrgId: string
   }
 
-type SchoolName = {
+export type SchoolName = {
   en: string;
   fi: string
 }
