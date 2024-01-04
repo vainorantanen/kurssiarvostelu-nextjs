@@ -1,13 +1,11 @@
-//import DeleteCourseButton from "@/components/DeleteCourseButton";
+
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import DeleteReviewButton from "@/components/DeleteReviewButton";
-import prisma from "@/db";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FaStar, FaCheckCircle, FaThumbsUp } from 'react-icons/fa';
 import { Review, User } from "@prisma/client";
-import { formatDistanceToNow } from 'date-fns';
 import dayjs from "dayjs";
 import BackButton from "@/app/ui/schools/courses/BackButton";
 import { getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
@@ -188,6 +186,12 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
                       )}
                         <p className="text-black mb-2 whitespace-break-spaces">{review.description}</p>
     
+                        {review.tips && review.tips.length > 0 && (
+                          <div className="text-black mb-2">
+                            <h2 className="text-lg">Vinkit</h2>
+                            <p>{review.tips}</p>
+                          </div>
+                        )}
                       <div>
                       <table className="table-auto mb-2">
   <tbody>
@@ -223,12 +227,40 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
     </tr>
     <tr>
       <td className="pr-4">
-        <p className="text-black">Hyöty muissa opinnoissa tai työelämässä</p>
+        <p className="text-black">Hyöty</p>
       </td>
       <td className="flex items-center">
         {[...Array(review.benefit)].map((_, index) => (
           <FaStar key={index} className="text-yellow-500" />
         ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Helppous</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(review.difficulty)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Kiinnostavuus</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(review.interest)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Työmäärä</p>
+      </td>
+      <td>
+        <p className="text-black">{review.workload}</p>
       </td>
     </tr>
     <tr>
@@ -241,10 +273,29 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
     </tr>
     <tr>
       <td>
-          <p className="text-black pr-4">Työmäärä (1-5) </p>
+          <p className="text-black pr-4">Arvostelukriteerit</p>
       </td>
       <td>
-        <p className="text-black">{review.workload}</p>
+        {review.gradingCriteria.length > 0 ? (
+           <p className="text-black">
+           {review.gradingCriteria.join(', ')}
+         </p>
+          
+        ) : (
+          <p className="text-black">-</p>
+        )}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Toteutusmuoto</p>
+      </td>
+      <td>
+        {review.deliveryMethod === "Ei valintaa" ? (
+          <p className="text-black">-</p>
+        ) : (
+          <p className="text-black">{review.deliveryMethod}</p>
+        )}
       </td>
     </tr>
   </tbody>

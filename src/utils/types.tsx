@@ -56,6 +56,21 @@ export type DegreeProgramme = {
   credits: Credits
 }
 
+export type SingleDegreeProgramme = {
+  id: string,
+  name: SchoolName,
+  documentState: string,
+  groupId: string,
+  code: string
+  contentDescription: DegreeText,
+  learningOutcomes: DegreeText,
+  targetCredits: Credits
+}
+
+export type DegreeText = {
+  fi: string
+}
+
 export enum GradingCriteria {
   Läsnäolopainotteinen = 'Läsnäolopainotteinen',
   Osallistumispainotteinen = 'Osallistumispainotteinen',

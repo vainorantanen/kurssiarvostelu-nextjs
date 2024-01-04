@@ -6,6 +6,7 @@ import TextSearch from "@/app/ui/schools/courses/TextSearch";
 import DegreeProgrammesList from "@/app/ui/schools/degreeProgrammes/degreeProgrammesList";
 import Pagination from "@/app/ui/schools/pagination";
 import Link from "next/link";
+import { FaCheck } from "react-icons/fa";
 
 export default async function SchoolsDegreeProgrammesPage({ params,
   searchParams }: {params: any, searchParams?: {
@@ -40,13 +41,21 @@ export default async function SchoolsDegreeProgrammesPage({ params,
   </button>
   <br></br>
   <BackButton />
+
   </div>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <div className="md:col-span-1">
+  <div className="p-2 bg-white rounded shadow text-black">
+  <h2 className="text-xl font-bold">{school.name.fi} koulutusohjelmien arvostelut</h2>
+    <p>Tällä sivulla voit lukea {school.name.fi} koulutusohjelmien arvosteluja.</p>
+    <p>Voit myös jättää oman arvostelun.</p>
+</div>
+
+
   </div>
   <div className="md:col-span-2">
   <div className="grid grid-cols-1 gap-4">
-    <h1 className="text-2xl text-center font-bold">{school.name.fi} koulutusohjelmat</h1>
+    <h1 className="text-2xl text-center font-bold">{school.name.fi} koulutusohjelmien arvostelut</h1>
     <TextSearch placeholder="Hae koulutusohjelmaa..."/>
     <DegreeProgrammesList universityOrgId={params.schoolId} currentPage={currentPage} query={query}/>
     {totalPages != null && totalPages > 1 && (

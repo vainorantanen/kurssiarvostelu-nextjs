@@ -62,3 +62,16 @@ model CourseRequest {
     schoolName String
     createdAt   DateTime @default(now())
 }
+
+model DegreeReview {
+    id       String    @id @default(auto()) @map("_id") @db.ObjectId
+    description String
+    rating          Int
+    workload    String
+    expectations Int
+    benefit Int
+    difficulty Int
+    degreeId String
+    writerIsVerified  Boolean @default(false)
+    isVisible Boolean @default(true)
+}

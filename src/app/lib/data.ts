@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { redirect } from 'next/navigation';
-import { Course, DegreeProgramme, Koulutusohjelma, School, SingleCourse } from '@/utils/types';
+import { Course, DegreeProgramme, Koulutusohjelma, School, SingleCourse, SingleDegreeProgramme } from '@/utils/types';
 
 export async function getCourse(courseId: string) {
     noStore()
@@ -233,4 +233,20 @@ export async function getSearchDegreeProgrammePages(schoolId: string, query: str
         console.error('getSearchCoursePages error: ', error);
         throw new Error('Failed to fetch total pages');
     }
+}
+
+export async function getDegree(degreeId: string) {
+    noStore()
+
+    try {
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/modules?id=${degreeId}`)
+        const data = await res.json()
+        return data[0] as SingleDegreeProgramme
+    } catch (error) {
+        throw new Error("Failed fetching degree")
+    }
+}
+
+export async function getReviewsByDegree(degreeId: string) {
+
 }
