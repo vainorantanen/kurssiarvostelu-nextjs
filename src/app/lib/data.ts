@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { redirect } from 'next/navigation';
-import { Course, Koulutusohjelma, School, SingleCourse } from '@/utils/types';
+import { Course, DegreeProgramme, Koulutusohjelma, School, SingleCourse } from '@/utils/types';
 
 export async function getCourse(courseId: string) {
     noStore()
@@ -192,3 +192,45 @@ export async function getSchools() {
   export async function getUser(email: string) {
     return prisma.user.findUnique({ where: { email } })
   }
+
+export async function getSearchDegreeProgrammes(schoolId: string, query: string,
+    currentPage: number) {
+    noStore()
+
+    var textQuery = "";
+
+    if (query && query.length > 0) {
+        textQuery = `fullTextQuery=${query}&`
+    }    
+
+    try {
+       const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/module-search?${textQuery}limit=${itemsPerPage}&start=${itemsPerPage*(currentPage-1)}&universityOrgId=${schoolId}&moduleType=DegreeProgramme`)
+       const data = await res.json()
+       return data.searchResults as DegreeProgramme[]
+    } catch (error) {
+        throw new Error("Virhe haettaessa tietoja")
+    }
+}
+
+export async function getSearchDegreeProgrammePages(schoolId: string, query: string) {
+
+    noStore()
+
+    var textQuery = "";
+
+    if (query && query.length > 0) {
+        textQuery = `fullTextQuery=${query}&`
+    }
+
+    try {
+        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/module-search?${textQuery}limit=${itemsPerPage}&start=0&universityOrgId=${schoolId}&moduleType=DegreeProgramme`)
+        const resultData = await res.json()
+        //console.log(resultData)
+        const totalPages = Math.ceil(Number(resultData.total)/Number(resultData.limit))
+        //console.log(totalPages)
+        return totalPages
+    } catch (error) {
+        console.error('getSearchCoursePages error: ', error);
+        throw new Error('Failed to fetch total pages');
+    }
+}

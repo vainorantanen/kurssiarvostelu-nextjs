@@ -49,6 +49,13 @@ export type SchoolName = {
   fi: string
 }
 
+export type DegreeProgramme = {
+  id: string,
+  code: string,
+  name: string,
+  credits: Credits
+}
+
 export enum GradingCriteria {
   Läsnäolopainotteinen = 'Läsnäolopainotteinen',
   Osallistumispainotteinen = 'Osallistumispainotteinen',
