@@ -7,16 +7,16 @@ import Notification from "./Notification";
 type UpvoteReviewProps = {
     schoolId: string;
     reviewId: string;
-    upvoteReview: (schoolId: string, reviewId: string) => Promise<string | null>;
+    likeCourseReview: (schoolId: string, reviewId: string) => Promise<string | null>;
     sessionIsNull: boolean;
   }
 
-export default function UpvoteButton({ schoolId, reviewId, upvoteReview, sessionIsNull }: UpvoteReviewProps) {
+export default function UpvoteButton({ schoolId, reviewId, likeCourseReview, sessionIsNull }: UpvoteReviewProps) {
   
   const [error, setError] = useState<string | null>(null);
 
   const handleUpvote = async () => {
-    const errorMessage = await upvoteReview(schoolId, reviewId);
+    const errorMessage = await likeCourseReview(schoolId, reviewId);
     setError(errorMessage);
     setTimeout(() => {
       setError(null)

@@ -49,6 +49,28 @@ export type SchoolName = {
   fi: string
 }
 
+export type DegreeProgramme = {
+  id: string,
+  code: string,
+  name: string,
+  credits: Credits
+}
+
+export type SingleDegreeProgramme = {
+  id: string,
+  name: SchoolName,
+  documentState: string,
+  groupId: string,
+  code: string
+  contentDescription: DegreeText,
+  learningOutcomes: DegreeText,
+  targetCredits: Credits
+}
+
+export type DegreeText = {
+  fi: string
+}
+
 export enum GradingCriteria {
   Läsnäolopainotteinen = 'Läsnäolopainotteinen',
   Osallistumispainotteinen = 'Osallistumispainotteinen',
@@ -92,4 +114,10 @@ export enum UserYear {
   VUONNA_6 = '6. vuonna',
   VUONNA_N = 'N. vuonna',
   EN_HALUA_KERTOA = 'En halua kertoa',
+}
+
+export enum WriterEmploymentStatus {
+  Working = "Työllistynyt",
+  NotWorking = "Työtön",
+  DoNotTell = 'En halua kertoa'
 }

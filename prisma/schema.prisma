@@ -26,12 +26,12 @@ model Review {
   deliveryMethod String
   writerIsVerified  Boolean @default(false)
   isVisible Boolean @default(true)
+  attendanceSemester String
   year        String
   user        User?     @relation(fields: [userId], references: [id])
   userId      String?   @db.ObjectId
   courseSisuId  String
   createdAt   DateTime @default(now())
-  reviewLikes     ReviewLike[]
   likesCount Int @default(0)
 }
 
@@ -41,17 +41,12 @@ model User {
   name String
   password String
   isVerified Boolean @default(false)
+  isDisabled Boolean @default(false)
   reviews Review[]
+  degreeReviews DegreeReview[]
   createdAt   DateTime @default(now())
-  userLikes       ReviewLike[]
-}
-
-model ReviewLike {
-  id      String    @id @default(auto()) @map("_id") @db.ObjectId
-  user    User      @relation(fields: [userId], references: [id])
-  userId  String    @db.ObjectId
-  review  Review    @relation(fields: [reviewId], references: [id])
-  reviewId String   @db.ObjectId
+  likedCourseReviews String[] @db.ObjectId
+  likedDegreeReviews String[] @db.ObjectId
 }
 
 model CourseRequest {
@@ -60,5 +55,26 @@ model CourseRequest {
     code String
     credits String
     schoolName String
+    createdAt   DateTime @default(now())
+}
+
+model DegreeReview {
+    id       String    @id @default(auto()) @map("_id") @db.ObjectId
+    description String
+    rating          Int
+    workload    String
+    expectations Int
+    benefit Int
+    employment Int
+    coursesQuality Int
+    difficulty Int
+    degreeId String
+    writerEmploymentStatus String
+    completionYear String
+    user        User?     @relation(fields: [userId], references: [id])
+    userId      String?   @db.ObjectId
+    writerIsVerified  Boolean @default(false)
+    isVisible Boolean @default(true)
+    likesCount Int @default(0)
     createdAt   DateTime @default(now())
 }

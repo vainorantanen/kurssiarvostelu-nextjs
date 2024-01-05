@@ -1,14 +1,10 @@
 import { getKoulutusOhjelmat, getReviewData, getSchool, getSearchCoursesPages, getTiedekunnat } from "@/app/lib/data";
+import ChooseDegreeProgrammeSearch from "@/app/ui/schools/courses/ChooseDegreeProgammeSearch";
 import ChooseSearch from "@/app/ui/schools/courses/ChooseSearch";
 import TextSearch from "@/app/ui/schools/courses/TextSearch";
 import CoursesList from "@/app/ui/schools/courses/courseslist";
 import Pagination from "@/app/ui/schools/pagination";
-import SearchCourses from "@/components/SearchCourses";
-import prisma from "@/db";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-
-
 
 export default async function SingleschoolPage({ params,
   searchParams }: {params: any, searchParams?: {
@@ -42,7 +38,7 @@ export default async function SingleschoolPage({ params,
 
   return (
     <div className="min-h-screen">
-      <h1 className="text-2xl mt-4 mb-4 text-center font-bold">{school.name.fi} Kurssit</h1>
+      <h1 className="text-2xl mt-4 mb-4 text-center font-bold">Kohteen {school.name.fi} kurssien ja koulutusohjelmien arvostelut</h1>
       <div className="mt-2 mb-3">
       <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
     <Link href='/'>Etusivu</Link>
@@ -54,7 +50,14 @@ export default async function SingleschoolPage({ params,
   </div>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
   <div className="md:col-span-1">
-  <div className="py-4">
+  <div className="mb-2 py-2">
+  <p className="mt-4 ml-1">Haetko koulutusohjelmien arvosteluita?</p>
+  <button className="ml-1 mt-1 bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600">
+    <Link href={`/koulut/${school.id}/koulutusohjelmat`}>{school.name.fi} koulutusohjelmat</Link>
+  </button>
+    </div>
+  <div className="py-2 px-2 bg-white rounded shadow text-black">
+    <h2 className="text-xl font-bold">Hae kursseja</h2>
     <ChooseSearch koulutusohjelmat={koulutusohjelmat} tiedekunnat={tiedekunnat}/>
     </div>
   </div>
@@ -74,10 +77,3 @@ export default async function SingleschoolPage({ params,
  </div>
   );
 }
-
-/**
- * <SearchCourses allReviews={allReviews}
-      schoolId={school.id} getSearchCourses={getSearchCourses}
-      getKoulutusOhjelmat={getKoulutusOhjelmat}
-      />
- */

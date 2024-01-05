@@ -3,52 +3,45 @@
 import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import Notification from "./Notification";
-import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types";
+import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload, WriterEmploymentStatus } from "@/utils/types";
 import Select, { ActionMeta, MultiValue } from 'react-select';
 
 type AddReviewProps = {
   id: string;
   sessionIsNull: boolean;
   schoolId: string;
-  addReview: (
+  addDegreeReview: (
     description: string,
     rating: number,
-    grade: UserGrade,
-    year: UserYear,
     workload: Workload,
-    courseSisuId: string,
+    degreeId: string,
     expectations: number,
-    materials: number,
     benefit: number,
     schoolId: string,
     difficulty: number,
-    interest: number,
-    tips: string,
-    gradingCriteria: GradingCriteria[],
-    deliveryMethod: DeliveryMethod,
-    attentanceSemester: string
+    completionYear: string,
+    employment: number,
+    coursesQuality: number,
+    writerEmploymentStatus: WriterEmploymentStatus
   ) => void;
 };
 
-export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }: AddReviewProps) {
+export default function AddDegreeReviewForm({ id, addDegreeReview, schoolId, sessionIsNull }: AddReviewProps) {
   const [description, setDescription] = useState("");
   const [rating, setRating] = useState(0);
   const [benefit, setBenefit] = useState(0);
   const [expectation, setExpectation] = useState(0);
-  const [materials, setMaterials] = useState(0);
-  const [grade, setGrade] = useState<UserGrade>(UserGrade.Five); // Initialize grade as an empty string
-  const [year, setYear] = useState<UserYear>(UserYear.VUONNA_1); // Initial year value
+  const [coursesQuality, setCoursesQuality] = useState(0);
+  const [completionYear, setCompletionYear] = useState<string>(""); // Initial year value
   const [ workload, setWorkload ] = useState<Workload>(Workload.Sopiva);
   const [ captcha, setCaptcha ] = useState<string | null>()
   const [error, setError] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false); // New state for terms acceptance
   const [ showNotification, setShowNotification ] = useState<boolean>(false)
   const [ difficulty, setDifficulty ] = useState(0)
-  const [ interest, setInterest ] = useState(0)
-  const [ tips, setTips ] = useState<string>('')
-  const [ gradingCriteria, setGradingCriteria ] = useState<GradingCriteria[]>([])
-  const [ deliveryMethod, setDeliveryMethod ] = useState<DeliveryMethod>(DeliveryMethod.EiValintaa)
-  const [ attendanceSemester, setAttendanceSemester ] = useState<string>("")
+  const [employment, setEmployment] = useState(0);
+  const [ writerEmploymentStatus, setWriterEmploymentStatus] = useState<WriterEmploymentStatus>(WriterEmploymentStatus.Working);
+
 
   const handleTermsCheckbox = () => {
     setAcceptedTerms(!acceptedTerms);
@@ -73,22 +66,31 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       description.trim() !== "" &&
       rating > 0
       && expectation > 0
-      && materials > 0
       && benefit > 0
-      && difficulty > 0 && interest > 0 && gradingCriteria != null
-      && deliveryMethod != null
-      && year != null
-      && grade != null
+      && difficulty > 0
       && workload != null
-      && attendanceSemester != ""
+      && completionYear != null
+      && writerEmploymentStatus != null
+      && coursesQuality > 0
+      && employment > 0
     ) {
-      addReview(description, rating, grade, year, workload, id, expectation, materials, benefit,
-      schoolId, difficulty, interest, tips, gradingCriteria,
-      deliveryMethod, attendanceSemester );
+      addDegreeReview(
+        description,
+        rating,
+        workload,
+        id,
+        expectation,
+        benefit,
+        schoolId,
+        difficulty,
+        completionYear,
+        employment,
+        coursesQuality,
+        writerEmploymentStatus
+      );
       setDescription("");
       setRating(0);
       setExpectation(0)
-      setMaterials(0)
       setBenefit(0) 
       notify()
     } else {
@@ -105,28 +107,9 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
     setWorkload(e.target.value as Workload);
   };
 
-  const handleUserGradeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setGrade(e.target.value as UserGrade);
+  const handleWriterEmploymentStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setWriterEmploymentStatus(e.target.value as WriterEmploymentStatus);
   };
-
-  const handleUserYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setYear(e.target.value as UserYear);
-  };
-
-  const handleCriteriaChange = (newValue: MultiValue<{ value: GradingCriteria; label: GradingCriteria; }>,
-    actionMeta: ActionMeta<{ value: GradingCriteria; label: GradingCriteria; }>) => {
-    const listOfVals = newValue.map(n => n.value) as GradingCriteria[]
-    setGradingCriteria(listOfVals)
-  };
-
-  const handleDeliveryMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setDeliveryMethod(e.target.value as DeliveryMethod);
-  };
-
-  const criteriaOptions = Object.values(GradingCriteria).map((value) => ({
-    value,
-    label: value,
-  }));
 
   const notify = () => {
     setShowNotification(true)
@@ -147,8 +130,8 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
   // Inside your component
   const years = getYears();
 
-  const handleAttendanceSemesterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setAttendanceSemester(e.target.value)
+  const handleCompletionYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCompletionYear(e.target.value)
   }
 
   return (
@@ -162,16 +145,8 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
         onChange={(e) => setDescription(e.target.value)}
       />
 
-<textarea
-        name="tips"
-        className="w-full h-40 px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
-        placeholder="Anna vinkkejä kurssiin (valinnainen)"
-        value={tips}
-        onChange={(e) => setTips(e.target.value)}
-      />
-
 <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Anna kurssille yleinen arvosana</p>
+        <p className="text-black">Anna koulutusohjelmalle yleinen arvosana</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -188,7 +163,7 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Kuinka hyvin kurssi vastasi odotuksiasi?</p>
+        <p className="text-black">Kuinka hyvin koulutusohjelma vastasi odotuksiasi?</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -205,15 +180,15 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Kurssilla käytettyjen materiaalien laatu</p>
+        <p className="text-black">Koulutusohjelmien kurssien laatu</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
               key={star}
               className={`cursor-pointer text-3xl ${
-                star <= materials ? "text-yellow-500" : "text-gray-400"
+                star <= coursesQuality ? "text-yellow-500" : "text-gray-400"
               }`}
-              onClick={() => handleStarClick(star, setMaterials)}
+              onClick={() => handleStarClick(star, setCoursesQuality)}
             >
               ★
             </span>
@@ -239,24 +214,7 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Kiinnostavuus</p>
-        <div className="flex space-x-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <span
-              key={star}
-              className={`cursor-pointer text-3xl ${
-                star <= interest ? "text-yellow-500" : "text-gray-400"
-              }`}
-              onClick={() => handleStarClick(star, setInterest)}
-            >
-              ★
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="my-4 flex flex-col jusitfy-center items-center">
-        <p className="text-black">Kurssin hyödyllisyys</p>
+        <p className="text-black">Koulutusohjelman hyödyllisyys</p>
         <div className="flex space-x-2">
           {[1, 2, 3, 4, 5].map((star) => (
             <span
@@ -265,6 +223,23 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
                 star <= benefit ? "text-yellow-500" : "text-gray-400"
               }`}
               onClick={() => handleStarClick(star, setBenefit)}
+            >
+              ★
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="my-4 flex flex-col jusitfy-center items-center">
+        <p className="text-black">Työllistyminen</p>
+        <div className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <span
+              key={star}
+              className={`cursor-pointer text-3xl ${
+                star <= employment ? "text-yellow-500" : "text-gray-400"
+              }`}
+              onClick={() => handleStarClick(star, setEmployment)}
             >
               ★
             </span>
@@ -290,42 +265,27 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4">
-        <p className="text-black">Minkä arvosanan sait kurssilta (1-5)?</p>
+        <p className="text-black">Työllisyystilanteesi valmistuessa</p>
         <select
-          id="grade"
-          name="grade"
-          value={grade}
-          onChange={handleUserGradeChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
-        >
-          {Object.values(UserGrade).map((value) => (
+        id="writerEmploymentStatus"
+        name="writerEmploymentStatus"
+        value={writerEmploymentStatus}
+        onChange={handleWriterEmploymentStatusChange}
+        className="w-32 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
+      >
+        {Object.values(WriterEmploymentStatus).map((value) => (
           <option key={value} value={value}>
             {value}
           </option>
         ))}
-        </select>
+      </select>
       </div>
 
       <div className="my-4">
-        <p className="text-black">Missä vaiheessa opintojasi suoritit kurssin?</p>
-        <select
-          value={year}
-          onChange={handleUserYearChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
-        >
-          {Object.values(UserYear).map((value) => (
-          <option key={value} value={value}>
-            {value}
-          </option>
-        ))}
-        </select>
-      </div>
-
-      <div className="my-4">
-  <p className="text-black">Minä vuonna suoritit kurssin?</p>
+  <p className="text-black">Minä vuonna valmistuit koulutusohjelmasta?</p>
   <select
-    value={attendanceSemester}
-    onChange={handleAttendanceSemesterChange}
+    value={completionYear}
+    onChange={handleCompletionYearChange}
     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
   >
     <option value="">Valitse vuosi</option>
@@ -337,33 +297,6 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
     ))}
   </select>
 </div>
-
-      <div className="my-4">
-        <p className="text-black">Opetusmuoto</p>
-        <select
-        id="deliverymethod"
-        name="deliverymethod"
-        value={deliveryMethod}
-        onChange={handleDeliveryMethodChange}
-        className="w-32 px-2 py-1 border border-gray-300 rounded focus:outline-none text-black"
-      >
-        {Object.values(DeliveryMethod).map((value) => (
-          <option key={value} value={value}>
-            {value}
-          </option>
-        ))}
-      </select>
-      </div>
-
-      <div className="my-4 text-black">
-        <p className="text-black">Kurssin arvostelukriteerit</p>
-        <Select
-        placeholder="Valitse..."
-        isMulti
-        options={criteriaOptions}
-        onChange={handleCriteriaChange}
-      />
-      </div>
 
       <div className="my-4 flex items-center">
   <p className="text-black">

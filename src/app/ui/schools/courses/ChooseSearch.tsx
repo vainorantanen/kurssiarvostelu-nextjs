@@ -33,7 +33,7 @@ export default function ChooseSearch({ koulutusohjelmat, tiedekunnat }: { koulut
       <div className='py-2'>
       <h2 className="text-lg font-semibold mb-2">Valitse tiedekunta</h2>
       <select
-        className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
+        className="p-2 border border-gray-300 rounded text-black w-full"
         value={facultyId}
         onChange={(e) => {
           setFacultyId(e.target.value);
@@ -48,11 +48,12 @@ export default function ChooseSearch({ koulutusohjelmat, tiedekunnat }: { koulut
         ))}
       </select>
       <br />
+      
       </div>
       <div className='py-2'>
-      <h2 className="text-lg font-semibold mb-2">Valitse koulutusohjelma</h2>
+      <h2 className="text-lg font-semibold mb-2">Valitse järjestäjä</h2>
       <select
-        className="p-2 border border-gray-300 rounded text-black max-w-[12rem]"
+        className="p-2 border border-gray-300 rounded text-black w-full"
         value={orgId}
         onChange={(e) => setOrgId(e.target.value)}
       >

@@ -6,7 +6,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "../api/auth/[...nextauth]/options"
 import { revalidatePath } from "next/cache"
 import { getUser } from "./data"
-import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types"
+import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload, WriterEmploymentStatus } from "@/utils/types"
 
 const emailEndings = [
     "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
@@ -20,7 +20,8 @@ export async function addReview(description: string,
     benefit: number, schoolId: string,
     difficulty: number, interest: number,
     tips: string, gradingCriteria: GradingCriteria[],
-    deliveryMethod: DeliveryMethod) {
+    deliveryMethod: DeliveryMethod,
+    attendanceSemester: string) {
   
   try {
     const session = await getServerSession(authOptions)
@@ -32,7 +33,8 @@ export async function addReview(description: string,
     || !expectations || typeof expectations !== 'number' || !materials
     || typeof materials !== 'number' || !benefit || typeof benefit !== 'number'
     || !interest || typeof interest !== 'number'
-    || !difficulty || typeof difficulty !== 'number') {
+    || !difficulty || typeof difficulty !== 'number'
+    || !attendanceSemester || typeof attendanceSemester != 'string') {
         throw new Error("Tarkista syötteesi")
       }
   
@@ -57,6 +59,7 @@ export async function addReview(description: string,
         tips,
         gradingCriteria,
         deliveryMethod,
+        attendanceSemester,
         writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
       user: {
         connect: {
@@ -85,6 +88,7 @@ export async function addReview(description: string,
         tips,
         gradingCriteria,
         deliveryMethod,
+        attendanceSemester,
         writerIsVerified: false
     } })
       //redirect('/kiitos-arvostelusta')
@@ -96,6 +100,137 @@ export async function addReview(description: string,
   }   
   }
 
+  export async function addDegreeReview(
+    description: string,
+    rating: number,
+    workload: Workload,
+    degreeId: string,
+    expectations: number,
+    benefit: number,
+    schoolId: string,
+    difficulty: number,
+    completionYear: string,
+    employment: number,
+    coursesQuality: number,
+    writerEmploymentStatus: WriterEmploymentStatus
+  ) {
+  
+  try {
+    const session = await getServerSession(authOptions)
+  
+    if (typeof description !== "string" || description.length === 0
+    || !rating || typeof rating !== 'number'
+    || !expectations || typeof expectations !== 'number'
+    || !benefit || typeof benefit !== 'number'
+    || !degreeId || degreeId.length === 0
+    || !difficulty || typeof difficulty !== 'number'
+    || !completionYear || !employment
+    || !coursesQuality
+    || !writerEmploymentStatus
+    ) {
+        throw new Error("Tarkista syötteesi")
+      }
+  
+    if (session && session.user && session.user.email) {
+      // käyttäjä on kirjautunut
+      const userFromDb = await prisma.user.findUnique({ where: { email: session.user.email } })
+      if (!userFromDb || (userFromDb && !userFromDb.isVerified)) {
+        throw new Error("Käyttäjää ei löytynyt tietokannasta tai sen sähköposti on vahvistamatta")
+      }
+      await prisma.degreeReview.create({ data: {
+        description,
+        rating,
+        workload,
+        degreeId,
+        expectations,
+        benefit,
+        difficulty,
+        completionYear,
+        employment,
+        coursesQuality,
+        writerEmploymentStatus,
+        writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
+      user: {
+        connect: {
+          email: session.user.email
+        }
+      },
+    } })
+      //redirect('/kiitos-arvostelusta')
+
+        revalidatePath(`/koulut/${schoolId}/koulutusohjelmat/${degreeId}`)
+
+    } else {
+      // käyttäjä ei ole kirjautunut
+      await prisma.degreeReview.create({ data: {
+        description,
+        rating,
+        workload,
+        degreeId,
+        expectations,
+        benefit,
+        difficulty,
+        completionYear,
+        employment,
+        coursesQuality,
+        writerEmploymentStatus,
+        writerIsVerified: false
+    } })
+      revalidatePath(`/koulut/${schoolId}/koulutusohjelmat/${degreeId}`)
+
+    }
+  } catch(error) {
+    return (<Error>error).message;
+  }   
+  }
+
+  export async function likeCourseReview(schoolId: string, reviewId: string) {
+    try {
+      const session = await getServerSession(authOptions);
+      const rev = await prisma.review.findUnique({ where: { id: reviewId } });
+  
+      if (!rev) {
+        throw new Error("Virhe: Arvostelua ei enää ole");
+      }
+  
+      if (!session || !session.user || !session.user.email) {
+        throw new Error("Virhe: Kirjaudu sisään tykätäksesi");
+      }
+  
+      const userFromDb = await getUser(session.user.email);
+  
+      if (!userFromDb) {
+        throw new Error("Virhe: Käyttäjää ei ole");
+      }
+
+      const userCurrentLikedRevs: string[] = userFromDb.likedCourseReviews
+
+      if (userCurrentLikedRevs.includes(reviewId)) {
+        throw new Error("Virhe: Olet jo tykännyt tästä");
+      }
+
+      const newList = userCurrentLikedRevs.concat(reviewId)
+
+      await prisma.user.update({ where: { id: userFromDb.id }, data: {
+        likedCourseReviews: newList
+      } })
+
+      const currentLikes = rev.likesCount;
+      const updatedLikes = currentLikes + 1;
+  
+      await prisma.review.update({
+        where: { id: reviewId },
+        data: { likesCount: updatedLikes },
+      });
+
+      revalidatePath(`/koulut/${schoolId}/kurssit/${reviewId}`);
+      return null; // No error occurred
+    } catch (error) {
+      return (<Error>error).message;
+    }
+  }
+
+  /*
   export async function upvoteReview(schoolId: string, reviewId: string) {
     try {
       const session = await getServerSession(authOptions);
@@ -147,6 +282,7 @@ export async function addReview(description: string,
       return (<Error>error).message;
     }
   }
+  */
   
 
 export async function deleteReview(id: string, schoolId:string) {
@@ -171,8 +307,7 @@ export async function deleteReview(id: string, schoolId:string) {
     if (session.user.email !== process.env.ADMIN && userFromDb.id !== rev.userId) {
       throw new Error("Vain admin tai arvostelun lisännyt voi poistaa arvostelun")
     }
-
-    await prisma.reviewLike.deleteMany({ where: { reviewId: id }})
+    
     await prisma.review.delete({ where: { id } });
 
     revalidatePath(`/koulut/${schoolId}/kurssit/${id}`)
