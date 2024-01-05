@@ -1,16 +1,22 @@
 import { getServerSession } from "next-auth"
 import Link from "next/link";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
-import AddReviewForm from "@/components/AddReviewForm";
 import BackButton from "@/app/ui/schools/courses/BackButton";
-import { addReview } from "@/app/lib/actions";
 import { getDegree } from "@/app/lib/data";
+import { addDegreeReview } from "@/app/lib/actions";
+import AddDegreeReviewForm from "@/components/AddDegreeReviewForm";
 
 export default async function AddDegreeReviewPage({ params }: any) {
-  const degree = await getDegree(params.degreeId)
+  
 
   const session = await getServerSession(authOptions)
   const sessionIsNull = session == null
+
+  if (!params) {
+    return null
+  }
+
+  const degree = await getDegree(params.degreeId)
 
   if (!degree) {
     return (
@@ -45,7 +51,10 @@ export default async function AddDegreeReviewPage({ params }: any) {
           </div>
       </div>
     )}
-
+      <div>
+        <AddDegreeReviewForm id={degree.id} addDegreeReview={addDegreeReview}
+        schoolId={params.schoolId} sessionIsNull={sessionIsNull} />
+      </div>
     </div>
   );
 }

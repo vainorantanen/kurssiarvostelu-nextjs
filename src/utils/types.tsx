@@ -115,3 +115,9 @@ export enum UserYear {
   VUONNA_N = 'N. vuonna',
   EN_HALUA_KERTOA = 'En halua kertoa',
 }
+
+export enum WriterEmploymentStatus {
+  Working = "Työllistynyt",
+  NotWorking = "Työtön",
+  DoNotTell = 'En halua kertoa'
+}

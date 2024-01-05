@@ -6,7 +6,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "../api/auth/[...nextauth]/options"
 import { revalidatePath } from "next/cache"
 import { getUser } from "./data"
-import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types"
+import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload, WriterEmploymentStatus } from "@/utils/types"
 
 const emailEndings = [
     "tuni.fi", "helsinki.fi", "jyu.fi", "aalto.fi", "hanken.fi", "student.lut.fi",
@@ -93,6 +93,90 @@ export async function addReview(description: string,
     } })
       //redirect('/kiitos-arvostelusta')
       revalidatePath(`/koulut/${schoolId}/kurssit/${courseSisuId}`)
+
+    }
+  } catch(error) {
+    return (<Error>error).message;
+  }   
+  }
+
+  export async function addDegreeReview(
+    description: string,
+    rating: number,
+    workload: Workload,
+    degreeId: string,
+    expectations: number,
+    benefit: number,
+    schoolId: string,
+    difficulty: number,
+    completionYear: string,
+    employment: number,
+    coursesQuality: number,
+    writerEmploymentStatus: WriterEmploymentStatus
+  ) {
+  
+  try {
+    const session = await getServerSession(authOptions)
+  
+    if (typeof description !== "string" || description.length === 0
+    || !rating || typeof rating !== 'number'
+    || !expectations || typeof expectations !== 'number'
+    || !benefit || typeof benefit !== 'number'
+    || !degreeId || degreeId.length === 0
+    || !difficulty || typeof difficulty !== 'number'
+    || !completionYear || !employment
+    || !coursesQuality
+    || !writerEmploymentStatus
+    ) {
+        throw new Error("Tarkista syötteesi")
+      }
+  
+    if (session && session.user && session.user.email) {
+      // käyttäjä on kirjautunut
+      const userFromDb = await prisma.user.findUnique({ where: { email: session.user.email } })
+      if (!userFromDb || (userFromDb && !userFromDb.isVerified)) {
+        throw new Error("Käyttäjää ei löytynyt tietokannasta tai sen sähköposti on vahvistamatta")
+      }
+      await prisma.degreeReview.create({ data: {
+        description,
+        rating,
+        workload,
+        degreeId,
+        expectations,
+        benefit,
+        difficulty,
+        completionYear,
+        employment,
+        coursesQuality,
+        writerEmploymentStatus,
+        writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
+      user: {
+        connect: {
+          email: session.user.email
+        }
+      },
+    } })
+      //redirect('/kiitos-arvostelusta')
+
+        revalidatePath(`/koulut/${schoolId}/koulutusohjelmat/${degreeId}`)
+
+    } else {
+      // käyttäjä ei ole kirjautunut
+      await prisma.degreeReview.create({ data: {
+        description,
+        rating,
+        workload,
+        degreeId,
+        expectations,
+        benefit,
+        difficulty,
+        completionYear,
+        employment,
+        coursesQuality,
+        writerEmploymentStatus,
+        writerIsVerified: false
+    } })
+      revalidatePath(`/koulut/${schoolId}/koulutusohjelmat/${degreeId}`)
 
     }
   } catch(error) {
