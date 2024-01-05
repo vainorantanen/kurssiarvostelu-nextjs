@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import { authOptions } from '../api/auth/[...nextauth]/options';
 import { redirect } from 'next/navigation';
-import { Course, DegreeProgramme, Koulutusohjelma, School, SingleCourse, SingleDegreeProgramme } from '@/utils/types';
+import { Course, DegreeProgramme, Koulutusohjelma, School, SearchCoursesResultsWithTotal, SearchDegreeResultsWithTotal, SingleCourse, SingleDegreeProgramme } from '@/utils/types';
 
 export async function getCourse(courseId: string) {
     noStore()
@@ -50,6 +50,8 @@ export async function getSearchCoursesPages(orgId: string, universityOrgId: stri
         organisationsQuery = `orgId=${orgId}`
     } else if (orgId == 'none' && orgRootId != 'none') {
         organisationsQuery = `orgRootId=${orgRootId}`
+    } else if (orgId == 'none' && orgRootId == 'none' && query.length >= 3) {
+        // do nothing
     } else {
         return null
     }
@@ -73,7 +75,7 @@ export async function getSearchCourses(orgId: string, universityOrgId: string,
     currentPage: number, query: string, orgRootId: string
     ){
     noStore()
-  
+
     var textQuery = "";
 
     if (query && query.length > 0) {
@@ -88,6 +90,8 @@ export async function getSearchCourses(orgId: string, universityOrgId: string,
         organisationsQuery = `orgId=${orgId}`
     } else if (orgId == 'none' && orgRootId != 'none') {
         organisationsQuery = `orgRootId=${orgRootId}`
+    } else if (orgId == 'none' && orgRootId == 'none' && query.length >= 3) {
+        // do nothing
     } else {
         return null
     }
@@ -96,7 +100,7 @@ export async function getSearchCourses(orgId: string, universityOrgId: string,
         const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/course-unit-search?${textQuery}limit=${itemsPerPage}&${organisationsQuery}&showMaxResults=false&start=${itemsPerPage*(currentPage-1)}&uiLang=fi&universityOrgId=${universityOrgId}&validity=ONGOING_AND_FUTURE`)
         const resultData = await res.json()
         //console.log(resultData)
-        return resultData.searchResults as Course[]
+        return resultData as SearchCoursesResultsWithTotal
     } catch (error) {
         console.error('getSearchCourses error: ', error);
         throw new Error('Failed to fetch courses');
@@ -206,7 +210,7 @@ export async function getSearchDegreeProgrammes(schoolId: string, query: string,
     try {
        const res = await fetch(`https://sis-tuni.funidata.fi/kori/api/module-search?${textQuery}limit=${itemsPerPage}&start=${itemsPerPage*(currentPage-1)}&universityOrgId=${schoolId}&moduleType=DegreeProgramme`)
        const data = await res.json()
-       return data.searchResults as DegreeProgramme[]
+       return data as SearchDegreeResultsWithTotal
     } catch (error) {
         throw new Error("Virhe haettaessa tietoja")
     }

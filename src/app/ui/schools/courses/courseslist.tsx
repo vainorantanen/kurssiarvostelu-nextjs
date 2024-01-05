@@ -18,13 +18,14 @@ export default async function CoursesList({
     orgRootId: string;
   }) { 
 
-    const courses = await getSearchCourses(orgId, universityOrgId, currentPage, query, orgRootId)
+    const coursesResultData = await getSearchCourses(orgId, universityOrgId, currentPage, query, orgRootId)
+    const courses = coursesResultData?.searchResults
 
     if (!courses || courses.length == 0) {
         return (
           <div className="bg-white rounded text-black py-4 text-center">
             <h2 className="font-bold text-xl">Lisää rajaustekijöitä</h2>
-            <p className="py-2">Valitse tiedekunta ja/tai koulutusohjelma, minkä jälkeen voit hakea kurssia hakusanallakin.</p>
+            <p className="py-2">Valitse tiedekunta ja/tai koulutusohjelma tai hae kurssia suoraan hakusanalla (vähintään 3 merkkiä)</p>
           </div>
         )
     }
@@ -33,7 +34,9 @@ export default async function CoursesList({
     const reviewData = await getReviewData(courseIds)
 
     return (
-        courses.map(course => {
+      <div>
+        <p className="font-bold">{coursesResultData.total} hakutulosta</p>
+        {courses.map(course => {
           const courseReviewData = reviewData.filter(d => d.courseSisuId === course.id)
 
           const reviewCount = courseReviewData.length
@@ -46,7 +49,7 @@ export default async function CoursesList({
           return (
             <div
             key={course.id}
-            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center"
+            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center my-2"
           >
             <div className="mr-4">
                                 <Link href={`/koulut/${universityOrgId}/kurssit/${course.id}?page=${currentPage}&orgId=${orgId}`}>
@@ -78,6 +81,8 @@ export default async function CoursesList({
           </div>
           )
         
-       }))
+       })}
+       </div>
+       )
        
   }
