@@ -76,4 +76,5 @@ model DegreeReview {
     writerIsVerified  Boolean @default(false)
     isVisible Boolean @default(true)
     likesCount Int @default(0)
+    createdAt   DateTime @default(now())
 }

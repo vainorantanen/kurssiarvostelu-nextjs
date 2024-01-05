@@ -248,5 +248,13 @@ export async function getDegree(degreeId: string) {
 }
 
 export async function getReviewsByDegree(degreeId: string) {
-
-}
+    
+    noStore()
+    try {
+        const res = await prisma.degreeReview.findMany({ where: { degreeId } })
+        return res
+    } catch (error) {
+        console.error('getReviews error: ', error);
+        throw new Error('Failed to fetch reviews');
+    }
+  }
