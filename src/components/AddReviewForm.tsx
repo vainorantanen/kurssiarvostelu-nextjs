@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import Notification from "./Notification";
-import Link from "next/link";
 import { DeliveryMethod, GradingCriteria, UserGrade, UserYear, Workload } from "@/utils/types";
 import Select, { ActionMeta, MultiValue } from 'react-select';
 
@@ -27,13 +26,9 @@ type AddReviewProps = {
     tips: string,
     gradingCriteria: GradingCriteria[],
     deliveryMethod: DeliveryMethod,
+    attentanceSemester: string
   ) => void;
 };
-
-type SelectedOptionsType = {
-  value: GradingCriteria;
-  label: string
-}
 
 export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }: AddReviewProps) {
   const [description, setDescription] = useState("");
@@ -53,6 +48,7 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
   const [ tips, setTips ] = useState<string>('')
   const [ gradingCriteria, setGradingCriteria ] = useState<GradingCriteria[]>([])
   const [ deliveryMethod, setDeliveryMethod ] = useState<DeliveryMethod>(DeliveryMethod.EiValintaa)
+  const [ attendanceSemester, setAttendanceSemester ] = useState<string>("")
 
   const handleTermsCheckbox = () => {
     setAcceptedTerms(!acceptedTerms);
@@ -84,10 +80,11 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       && year != null
       && grade != null
       && workload != null
+      && attendanceSemester != ""
     ) {
       addReview(description, rating, grade, year, workload, id, expectation, materials, benefit,
       schoolId, difficulty, interest, tips, gradingCriteria,
-      deliveryMethod );
+      deliveryMethod, attendanceSemester );
       setDescription("");
       setRating(0);
       setExpectation(0)
@@ -136,6 +133,22 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
     setTimeout(() => {
       setShowNotification(false)
     }, 10000)
+  }
+
+  const getYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = 2015; year <= currentYear; year++) {
+      years.push(year);
+    }
+    return years;
+  };
+  
+  // Inside your component
+  const years = getYears();
+
+  const handleAttendanceSemesterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setAttendanceSemester(e.target.value)
   }
 
   return (
@@ -294,7 +307,7 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
       </div>
 
       <div className="my-4">
-        <p className="text-black">Missä vaiheessa opintoja suoritit kurssin?</p>
+        <p className="text-black">Missä vaiheessa opintojasi suoritit kurssin?</p>
         <select
           value={year}
           onChange={handleUserYearChange}
@@ -307,6 +320,23 @@ export default function AddReviewForm({ id, addReview, schoolId, sessionIsNull }
         ))}
         </select>
       </div>
+
+      <div className="my-4">
+  <p className="text-black">Minä vuonna suoritit kurssin?</p>
+  <select
+    value={attendanceSemester}
+    onChange={handleAttendanceSemesterChange}
+    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none text-black"
+  >
+    <option value="">Valitse vuosi</option>
+    <option value="En halua kertoa">En halua kertoa</option>
+    {years.map((year) => (
+      <option key={year} value={year}>
+        {year}
+      </option>
+    ))}
+  </select>
+</div>
 
       <div className="my-4">
         <p className="text-black">Opetusmuoto</p>

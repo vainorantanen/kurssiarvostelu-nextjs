@@ -20,7 +20,8 @@ export async function addReview(description: string,
     benefit: number, schoolId: string,
     difficulty: number, interest: number,
     tips: string, gradingCriteria: GradingCriteria[],
-    deliveryMethod: DeliveryMethod) {
+    deliveryMethod: DeliveryMethod,
+    attendanceSemester: string) {
   
   try {
     const session = await getServerSession(authOptions)
@@ -32,7 +33,8 @@ export async function addReview(description: string,
     || !expectations || typeof expectations !== 'number' || !materials
     || typeof materials !== 'number' || !benefit || typeof benefit !== 'number'
     || !interest || typeof interest !== 'number'
-    || !difficulty || typeof difficulty !== 'number') {
+    || !difficulty || typeof difficulty !== 'number'
+    || !attendanceSemester || typeof attendanceSemester != 'string') {
         throw new Error("Tarkista syötteesi")
       }
   
@@ -57,6 +59,7 @@ export async function addReview(description: string,
         tips,
         gradingCriteria,
         deliveryMethod,
+        attendanceSemester,
         writerIsVerified: userFromDb.isVerified && emailEndings.includes(userFromDb.email.split('@')[1]),
       user: {
         connect: {
@@ -85,6 +88,7 @@ export async function addReview(description: string,
         tips,
         gradingCriteria,
         deliveryMethod,
+        attendanceSemester,
         writerIsVerified: false
     } })
       //redirect('/kiitos-arvostelusta')

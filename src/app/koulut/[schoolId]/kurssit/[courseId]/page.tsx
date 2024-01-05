@@ -177,7 +177,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
                         sessionIsNull={sessionIsNull}/>
                         </div>
                         <div>
-                         <p className="text-xs text-black mb-2">{dayjs(review.createdAt).format('DD.MM.YYYY')}</p>
+                         <p className="text-xs text-black mb-2">{dayjs(review.createdAt).format('DD.MM.YYYY')}, Suoritettu: {review.attendanceSemester}</p>
                         {review.writerIsVerified && (
                         <div className="mb-2 flex items-center">
                           <FaCheckCircle className="text-blue-500 mr-2" />
@@ -315,7 +315,9 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
                     </div>
                   ))
                 ) : (
-                  <p className="text-white mb-2 text-center">Ei vielä arvosteluja</p>
+                  <div className="bg-white rounded shadow text-black p-2">
+                    <p className="text-center">Ei vielä arvosteluja, lisää sinä ensimmäinen!</p>
+                  </div>
                 ) }
               </div>
             </div>
