@@ -100,6 +100,53 @@ export async function addReview(description: string,
   }   
   }
 
+  export async function likeCourseReview(schoolId: string, reviewId: string) {
+    try {
+      const session = await getServerSession(authOptions);
+      const rev = await prisma.review.findUnique({ where: { id: reviewId } });
+  
+      if (!rev) {
+        throw new Error("Virhe: Arvostelua ei enää ole");
+      }
+  
+      if (!session || !session.user || !session.user.email) {
+        throw new Error("Virhe: Kirjaudu sisään tykätäksesi");
+      }
+  
+      const userFromDb = await getUser(session.user.email);
+  
+      if (!userFromDb) {
+        throw new Error("Virhe: Käyttäjää ei ole");
+      }
+
+      const userCurrentLikedRevs: string[] = userFromDb.likedCourseReviews
+
+      if (userCurrentLikedRevs.includes(reviewId)) {
+        throw new Error("Virhe: Olet jo tykännyt tästä");
+      }
+
+      const newList = userCurrentLikedRevs.concat(reviewId)
+
+      await prisma.user.update({ where: { id: userFromDb.id }, data: {
+        likedCourseReviews: newList
+      } })
+
+      const currentLikes = rev.likesCount;
+      const updatedLikes = currentLikes + 1;
+  
+      await prisma.review.update({
+        where: { id: reviewId },
+        data: { likesCount: updatedLikes },
+      });
+
+      revalidatePath(`/koulut/${schoolId}/kurssit/${reviewId}`);
+      return null; // No error occurred
+    } catch (error) {
+      return (<Error>error).message;
+    }
+  }
+
+  /*
   export async function upvoteReview(schoolId: string, reviewId: string) {
     try {
       const session = await getServerSession(authOptions);
@@ -151,6 +198,7 @@ export async function addReview(description: string,
       return (<Error>error).message;
     }
   }
+  */
   
 
 export async function deleteReview(id: string, schoolId:string) {
@@ -175,8 +223,7 @@ export async function deleteReview(id: string, schoolId:string) {
     if (session.user.email !== process.env.ADMIN && userFromDb.id !== rev.userId) {
       throw new Error("Vain admin tai arvostelun lisännyt voi poistaa arvostelun")
     }
-
-    await prisma.reviewLike.deleteMany({ where: { reviewId: id }})
+    
     await prisma.review.delete({ where: { id } });
 
     revalidatePath(`/koulut/${schoolId}/kurssit/${id}`)

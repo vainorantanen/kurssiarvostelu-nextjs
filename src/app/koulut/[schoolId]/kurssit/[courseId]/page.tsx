@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import BackButton from "@/app/ui/schools/courses/BackButton";
 import { getCourse, getReviewsByCourse, getUser } from "@/app/lib/data";
 import UpvoteButton from "@/components/UpvoteButton";
-import { deleteReview, upvoteReview } from "@/app/lib/actions";
+import { deleteReview, likeCourseReview } from "@/app/lib/actions";
 
 
   export default async function SingleCoursePage({ params }: any) {
@@ -173,7 +173,7 @@ import { deleteReview, upvoteReview } from "@/app/lib/actions";
                           <FaThumbsUp />
                           <p>{review.likesCount}</p>
                           </div>
-                          <UpvoteButton schoolId={params.schoolId} reviewId={review.id} upvoteReview={upvoteReview}
+                          <UpvoteButton schoolId={params.schoolId} reviewId={review.id} likeCourseReview={likeCourseReview}
                         sessionIsNull={sessionIsNull}/>
                         </div>
                         <div>
