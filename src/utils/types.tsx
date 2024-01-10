@@ -49,6 +49,16 @@ export type SchoolName = {
   fi: string
 }
 
+export type SearchCoursesResultsWithTotal = {
+  total: number,
+  searchResults: Course[]
+}
+
+export type SearchDegreeResultsWithTotal = {
+  total: number,
+  searchResults: DegreeProgramme[]
+}
+
 export type DegreeProgramme = {
   id: string,
   code: string,

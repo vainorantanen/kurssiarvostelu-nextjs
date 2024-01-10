@@ -15,24 +15,27 @@ export default async function DegreeProgrammesList({
     query: string;
   }) { 
 
-    const degreeProgrammes = await getSearchDegreeProgrammes(universityOrgId, query, currentPage)
+    const degreeProgrammesResult = await getSearchDegreeProgrammes(universityOrgId, query, currentPage)
+    const degreeProgrammes = degreeProgrammesResult.searchResults
 
     if (!degreeProgrammes || degreeProgrammes.length == 0) {
         return (
           <div className="bg-white rounded text-black py-4 text-center">
             <h2 className="font-bold text-xl">Lisää rajaustekijöitä</h2>
-            <p className="py-2">Valitse tiedekunta ja/tai koulutusohjelma, minkä jälkeen voit hakea kurssia hakusanallakin.</p>
+            <p className="py-2">Valitse tiedekunta ja/tai koulutusohjelma tai koulutusohjelmaa hakusanalla (vähintään 3 merkkiä).</p>
           </div>
         )
     }
 
     return (
-        degreeProgrammes.map(degree => {
+      <div>
+        <p className="font-bold">{degreeProgrammesResult.total} hakutulosta</p>
+        {degreeProgrammes.map(degree => {
 
           return (
             <div
             key={degree.id}
-            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center"
+            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg flex items-center my-2"
           >
             <div className="mr-4">
                                 <Link href={`/`}>
@@ -57,6 +60,9 @@ export default async function DegreeProgrammesList({
           </div>
           )
         
-       }))
+       })}
+       
+       </div>
+       )
        
   }
