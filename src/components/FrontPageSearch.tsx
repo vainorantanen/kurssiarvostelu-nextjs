@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { School } from '@/utils/types';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 type FrontPageSearchProps = {
   initialSchools: School[];
@@ -27,18 +28,18 @@ const FrontPageSearch: React.FC<FrontPageSearchProps> = ({ initialSchools }) => 
   };
 
   return (
-    <div className="w-full md:w-96">
+    <div className="w-full">
       <input
         type="text"
         placeholder="Hae koulua"
-        className="px-3 py-2 border rounded w-full sm:w-96 shadow focus:outline-none text-black"
+        className="block w-full rounded-md border border-gray-200 py-[9px] pl-2 text-sm outline-2 placeholder:text-gray-500 text-black"
         value={searchTerm}
         onChange={handleSearch}
         onClick={() => setIsMenuOpen(true)}
       />
       {isMenuOpen && schools.length > 0 && (
         <div>
-        <div className="text-black left-0 w-full md:w-96 max-h-40 bg-white border rounded shadow mt-2 overflow-y-auto">
+        <div className="text-black left-0 w-full max-h-40 bg-white border rounded shadow mt-2 overflow-y-auto">
           <ul>
             {schools.map((school, index) => (
               <li key={school.id} className="my-2">

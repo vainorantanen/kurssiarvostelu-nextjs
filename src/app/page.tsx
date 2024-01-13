@@ -6,86 +6,174 @@ import FrontPageSearch from '@/components/FrontPageSearch';
 import MakeCourseVisible from '@/components/MakeCourseVisible';
 import Image from 'next/image';
 import schoolImage from '@/Assets/school.png'
-import booksPic from '@/Assets/books.png'
-import geometryPic from '@/Assets/geometry.png'
-import anonymPic from '@/Assets/anonym.png'
-import { FaStar, FaCheckCircle } from 'react-icons/fa';
+
+import { FaStar, FaCheckCircle, FaThumbsUp } from 'react-icons/fa';
 import { getSchools } from './lib/data';
+import FrontPageInfo from './ui/frontpage-info';
 
 
 export default async function Home() {
 
   const session = await getServerSession(authOptions)
 
-  console.log("session at Home", session)
-
   const schools = await getSchools()
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <h1 className="text-4xl my-4 font-bold">Selaa ja arvostele yliopistokursseja anonyymisti.</h1>
-      <div className="h-64">
-        <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.fi.localeCompare(b.name.fi))}/>
-        </div>
-        <div className="flex items-center flex-wrap gap-4 justify-center">
-        <div className="relative w-60 h-60">
-        <Image
-        src={booksPic}
-        alt="Books"
-        />
-         </div>
-          <div className="max-w-lg">
-              <h1 className='text-2xl font-bold mb-3'>Etsi haluamasi kurssi koulusi kurssitarjonnasta</h1>
-              <p>Voit hakea kursseja koulujen perusteella suoraan hakusanoilla tai suodattamalla hakutuloksia
-                 haluamallasi tavalla.
-              </p>
+    <div className='w-full'>
+
+      <div className='grid grid-cols-1 sm:grid-cols-2 my-4 gap-2 w-full'>
+        <div className='sm:grid-cols-1'>
+          <h1 className="text-2xl md:text-4xl py-1 font-bold tracking-wide">Lue arvosteluja.</h1>
+          <h1 className="text-2xl md:text-4xl py-1 font-bold tracking-wide">Kirjoita arvosteluja.</h1>
+          <h1 className="text-2xl md:text-4xl py-1 font-bold tracking-wide">Löydä parhaat kurssit sinun koulutusohjelmaasi.</h1>
+          
+          <div className='py-3'>
+          <FrontPageSearch initialSchools={schools.sort((a, b) => a.name.fi.localeCompare(b.name.fi))}/>
           </div>
+
         </div>
-        <br></br>
-        <div className="flex items-center flex-wrap-reverse gap-4 justify-center">
-          <div className="max-w-lg">
-              <h1 className='text-2xl font-bold mb-3'>Lue kurssin arvosteluja ja lisää omasi</h1>
-              <p>Tutustumalla kurssin saamiin arvosteluihin muilta opiskelijoilta ja alumneilta, 
-                pystyt valitsemaan opintoihisi sopivimmat kurssit.
-              </p>
-          </div>
-          <div className="relative w-60 h-60">
-        <Image
-        src={geometryPic}
-        alt="Geometry"
-        />
-         </div>
+        <div className='sm:grid-cols-1'>
+          {/* Example review */}
+
+          <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg
+                    flex flex-wrap gap-3">
+                      <div className={`flex flex-col text-black text-center font-bold`}>
+                        <div className={`rounded p-2 bg-green-500`}>
+                        <p>Yhteensä</p>
+                        <p className="text-xl">{4.5}</p>
+                        </div>
+                        <div className="py-3 gap-2 flex items-center">
+                          <FaThumbsUp />
+                          <p>{100}</p>
+                          </div>
+                        </div>
+                        <div>
+                         <p className="text-xs text-black mb-2">1.1.2024, Suoritettu: {2023}</p>
+                        <div className="mb-2 flex items-center">
+                          <FaCheckCircle className="text-blue-500 mr-2" />
+                          <p className="text-black">Verifioitu opiskelija</p>
+                        </div>
+                        <p className="text-black mb-2 whitespace-break-spaces">Kuvaus tähän</p>
+    
+                          <div className="text-black mb-2">
+                            <h2 className="text-lg">Vinkit</h2>
+                            <p>Tässä vinkit</p>
+                          </div>
+                      <div>
+                      <table className="table-auto mb-2">
+  <tbody>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Yleisarvosana</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Kurssi vastasi odotuksia</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Kurssin materiaalit</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td className="pr-4">
+        <p className="text-black">Hyöty</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Helppous</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Kiinnostavuus</p>
+      </td>
+      <td className="flex items-center">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} className="text-yellow-500" />
+        ))}
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Työmäärä</p>
+      </td>
+      <td>
+        <p className="text-black">{"Sopiva"}</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Saatu arvosana </p>
+      </td>
+      <td>
+        <p className="text-black">{5}</p>
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Arvostelukriteerit</p>
+      </td>
+      <td>
+           <p className="text-black">
+           Koepainotteinen
+         </p>
+          
+      </td>
+    </tr>
+    <tr>
+      <td>
+          <p className="text-black pr-4">Toteutusmuoto</p>
+      </td>
+      <td>
+          <p className="text-black">Hybridi</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+                        </div>
+                      
+                
+                    </div>
+                    </div>
+
         </div>
-        <br></br>
-        <div className="flex items-center flex-wrap gap-4 justify-center">
-        <div className="relative w-60 h-60">
-        <Image
-        src={anonymPic}
-        alt="Anonyymi"
-        />
-         </div>
-          <div className="max-w-lg">
-              <h1 className='text-2xl font-bold mb-3'>Anonyymit arvostelut</h1>
-              <p>Arvostelut ovat täysin anonyymejä eli arvostelijan tiedot eivät ole muiden näkyvillä. 
-                Voit siis huoletta antaa kurssien risut ja ruusut! 
-              </p>
-          </div>
-        </div>
-        <br></br>
-        <div className="flex items-center flex-wrap-reverse gap-4 justify-center">
-          <div className="max-w-lg">
-              <h1 className='text-2xl font-bold mb-3'>Verifioitu opiskelija -merkki</h1>
-              <p>Kirjautumalla sisään koulusi sähköpostilla ja vahvistamalla sen, saat verifioidun opiskelijan merkin arvosteluusi.
-              Arvostelun voi jättää myös kirjautumatta sisään! 
-              </p>
-          </div>
-          <div>
-        <FaCheckCircle
-          className="w-60 h-60"
-        />
-         </div>
-        </div>
-      <h1 className="text-3xl font-bold">Alustan koulut</h1>
+      </div>
+      
+
+
+
+      <FrontPageInfo />
+
+      <h1 className="text-xl sm:text-3xl font-bold text-center py-3">Alustan koulut</h1>
       <div className="flex flex-wrap justify-center">
   {schools.map((school) => (
     <div key={school.id} className="m-4 p-4 bg-white rounded-lg shadow-md hover:shadow-lg w-48">
@@ -94,7 +182,7 @@ export default async function Home() {
           <Image
             src={schoolImage} // Kuvan lähde
             alt={school.name.fi}
-            layout="fill"
+            layout="fill"   
             objectFit="cover"
           />
         </div>
