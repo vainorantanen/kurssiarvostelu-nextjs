@@ -18,6 +18,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+      <meta name="google-site-verification" content="sX5JYKmHbJVXkbF53l1DtgaIdSPBN883kwkMnVWlg3w" />
+      </head>
       <body
         className={`${inter.className} bg-slate-800 text-slate-100 container mx-auto p-4 spacer layer1`}
       >
